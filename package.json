@@ -1,0 +1,26 @@
+{
+  "name": "webdev.javascript.inventory-app",
+  "version": "0.0.1",
+  "description": "An inventory web app",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tonyoruovo/WebDev.Javascript.Inventory-App.git"
+  },
+  "keywords": [
+    "inventory",
+    "web",
+    "app",
+    "web",
+    "app"
+  ],
+  "author": "Mathaid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tonyoruovo/WebDev.Javascript.Inventory-App/issues"
+  },
+  "homepage": "https://github.com/tonyoruovo/WebDev.Javascript.Inventory-App#readme"
+}
