@@ -1,0 +1,11 @@
+{
+    "inDev": true,
+    "api": {
+        "port": 27017,
+        "host": "127.0.0.1",
+        "username": "mathaid",
+        "password": "qwerty#123()",
+        "ver": "1"
+    },
+    "maxAge": 90
+}

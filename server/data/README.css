@@ -1,0 +1,68 @@
+
+table,
+th,
+td {
+  border: 1px solid;
+}
+caption {
+    border-width: 0px 0px 1px 0px;
+    border-color: black;
+    border-style: solid;
+}
+tfoot th {
+    border-top-width: 1px;
+    border-top-color: black;
+    border-top-style: solid;
+    border-bottom: none;
+}
+
+table {
+  width: fit-content;
+  max-width: 80%;
+  height: fit-content;
+  max-height: 30em;
+  margin: 0 auto;
+  display: block;
+  overflow-x: auto;
+  border-spacing: 0;
+}
+
+tbody {
+  white-space: nowrap;
+}
+
+th,
+td {
+  padding: 5px 10px;
+  border-top-width: 0;
+  border-left-width: 0;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  vertical-align: bottom;
+}
+
+th:last-child,
+td:last-child {
+  border-right-width: 0;
+}
+
+tr:last-child td {
+  border-bottom-width: 0;
+}
+
+h4,
+h5{
+    font-family: "Croissant One", serif;
+    font-size: larger;
+    /* font-family: "Markazi Text", monospace; */
+}
+p, li {
+    font-family: "Exo 2", sans-serif;
+}
+ol > li {
+    list-style-type: upper-roman;
+}

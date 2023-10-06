@@ -1,0 +1,32 @@
+{
+  "env": {
+    "node": true,
+    "es6": false
+  },
+  "rules": {
+    "no-var": "warn",
+    "vars-on-top": "warn",
+    // "one-var": "warn",
+    "one-var-declaration-per-line": "warn",
+    "no-label-var": "error",
+    "block-scoped-var": "error",
+    "no-unused-vars": "warn",
+    "no-undef": "error",
+    "no-unmodified-loop-condition": "warn",
+    "no-duplicate-imports": "warn",
+    "no-useless-rename": "warn"
+  },
+  "parserOptions": {
+    "sourceType": "script",
+    "ecmaVersion": 12,
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "impliedStrict": true,
+      "arrowFunctions": true,
+      "modules": true,
+      "restParams": true,
+      "templateStrings": true,
+      "unicodeCodePointEscapes": true
+    }
+  }
+}

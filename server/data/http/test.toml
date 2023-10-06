@@ -1,0 +1,4 @@
+url = "localhost:7070/api/v1/cmd/connect"
+request = "GET"
+header = "Content-Type: application/json"
+data = @server\\data\\http\\connStr.json

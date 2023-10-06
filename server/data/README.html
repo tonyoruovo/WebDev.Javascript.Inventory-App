@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Croissant+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="README.css" /> -->
+    <title>data</title>
+  </head>
+  <style>
+    table,
+    th,
+    td {
+      border: 1px solid;
+    }
+    caption {
+        border-width: 0px 0px 1px 0px;
+        border-color: black;
+        border-style: solid;
+    }
+    tfoot th {
+        border-top-width: 1px;
+        border-top-color: black;
+        border-top-style: solid;
+        border-bottom: none;
+    }
+    
+    table {
+      width: fit-content;
+      max-width: 80%;
+      height: fit-content;
+      max-height: 30em;
+      margin: 0 auto;
+      display: block;
+      overflow-x: auto;
+      border-spacing: 0;
+    }
+    
+    tbody {
+      white-space: nowrap;
+    }
+    
+    th,
+    td {
+      padding: 5px 10px;
+      border-top-width: 0;
+      border-left-width: 0;
+    }
+    
+    th {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      vertical-align: bottom;
+    }
+    
+    th:last-child,
+    td:last-child {
+      border-right-width: 0;
+    }
+    
+    tr:last-child td {
+      border-bottom-width: 0;
+    }
+    
+    h4,
+    h5{
+        font-family: "Croissant One", serif;
+        font-size: larger;
+        /* font-family: "Markazi Text", monospace; */
+    }
+    p, li {
+        font-family: "Exo 2", sans-serif;
+    }
+    ol > li {
+        list-style-type: upper-roman;
+    }
+  </style>
+  <body>
+    <main>
+            <p>The following were are models for a sample inventory app.
+                <ol>
+                    <li>
+                        <h4>Product model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Name</li>
+                                    <li>Desc</li>
+                                    <li>Category</li>
+                                    <li>Manufacturer</li>
+                                    <li>Supplier info</li>
+                                    <li>Price</li>
+                                    <li>Quantity in stock</li>
+                                    <li>Reorder point</li>
+                                    <li>Barcode/UPC</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>May have relationships with sales transactions, purchase orders, and suppliers.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Location model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Name</li>
+                                    <li>Address</li>
+                                    <li>Capacity</li>
+                                    <li>Account details</li>
+                                    <li>Ts & Cs</li>
+                                    <li>Signature</li>
+                                    <li>logo light</li>
+                                    <li>logo dark</li>
+                                    <li>Default status (e.g, Ordered, Confimred, Processing, Shipping, Delivered)</li>
+                                    <li>Codes of acceptable currencies</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>Products can be stored at specific locations.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Inventory Transaction model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Product Id</li>
+                                    <li>Location Id</li>
+                                    <li>Quantity</li>
+                                    <li>Timestamp</li>
+                                    <li>User/Employee info</li>
+                                    <li>Type (e.g., purchase, sale, transfer)</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>Links product changes to specific transactions.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Supplier model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Contact Info</li>
+                                    <li>Payment terms</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>Products can be associated with specific suppliers.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Customer model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Contact Info</li>
+                                    <li>Transaction history</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>Links customer data to sales transactions.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Purchase Order model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Order number</li>
+                                    <li>Supplier Info</li>
+                                    <li>Order Date</li>
+                                    <li>Expected delivery date</li>
+                                    <li>Status (e.g., pending, received)</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>Tied to products being ordered.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Sales Order model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Order number</li>
+                                    <li>Customer Info</li>
+                                    <li>Order Date</li>
+                                    <li>Status (e.g., pending, received, cancelled, failed)</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>Linked to products sold.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>User/Employee model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Role/Permission</li>
+                                    <li>Login credentials</li>
+                                    <li>Status (e.g., pending, received, cancelled, failed)</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>Associates transactions and changes with specific employees.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Alerts and Notifications model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Type (e.g., low stock, expired products)</li>
+                                    <li>Message</li>
+                                    <li>Timestamp</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>Relates to products and inventory levels.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Report model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Type (e.g., sales report, inventory valuation)</li>
+                                    <li>Parameters and filters</li>
+                                    <li>Generated Date</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5><ul><li>May be related to various data models for reporting purposes.</li></ul></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <h4>Contact model</h4>
+                        <ul>
+                            <li>
+                                <h5>Atrributes</h5>
+                                <ul>
+                                    <li>Id</li>
+                                    <li>Full name</li>
+                                    <li>Company name (if applicable)</li>
+                                    <li>Email</li>
+                                    <li>Phone</li>
+                                    <li>Address</li>
+                                    <li>Additional contact information (e.g., fax number, website)</li>
+                                </ul>
+                            </li>
+                            <li><h5>Relationships</h5>
+                                <ul>
+                                    <li>Associated with suppliers, customers, employees, and possibly other entities like manufacturers or distributors.</li>
+                                    <li>
+                                        The Contact Model allows you to centralize and manage contact information for various entities that interact with
+                                        your inventory management system. This can help in tracking and communicating with suppliers, customers, and
+                                        employees efficiently. Each contact can be associated with relevant entities in the system, such as linking a
+                                        contact to a specific supplier or customer.
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+    </main>
+    <script>
+        const allTables = document.querySelectorAll("table");
+
+for (const table of allTables) {
+  const tBody = table.tBodies[0];
+  const rows = Array.from(tBody.rows);
+  const headerCells = table.tHead.rows[0].cells;
+
+  for (const th of headerCells) {
+    const cellIndex = th.cellIndex;
+
+    th.addEventListener("click", () => {
+      rows.sort((tr1, tr2) => {
+        const tr1Text = tr1.cells[cellIndex].textContent;
+        const tr2Text = tr2.cells[cellIndex].textContent;
+        return tr1Text.localeCompare(tr2Text);
+      });
+
+      tBody.append(...rows);
+    });
+  }
+}
+
+    </script>
+  </body>
+</html>
