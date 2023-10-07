@@ -4,10 +4,13 @@
   "version": "0.0.1",
   "description": "An inventory web app",
   "main": "index.js",
+  "engines": {
+    "node": "^18.13.0"
+  },
   "scripts": {
     "test": "node index.test.js",
-    "start": "node server/server.js",
-    "watch": "nodemon server/server.js"
+    "start": "node index.js",
+    "watch": "nodemon index.js"
   },
   "repository": {
     "type": "git",
