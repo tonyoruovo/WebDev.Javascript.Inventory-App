@@ -17,14 +17,11 @@ const email = {
     _e: {
         type: mongoose.Schema.Types.String,
         trim: true,
-        validate: {
-            validator: function(v) {
-                return v && v.length > 0 && v.indexOf("@") > -1;
-            },
-            message: function(props) {return `${props.value} is not a valid email`;}
-        },
+        match: /.*@.*/g,
+        minlength: 3,
         unique: true,
-        required: true
+        required: true,
+        alias: "email"
     },
     _v: {
         type: mongoose.Schema.Types.Boolean,

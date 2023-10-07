@@ -1,86 +1,91 @@
 
 const mongoose = require("mongoose");
-const { US } = require("../repos/utility.cjs");
-/**
- * An object with structred address data.
- * @typedef {Object} AddressRecord
- * @property {string} streetName the name of the street
- * @property {string} [landmark=null] any popular structure/edifice which can be used to identify the given street
- * @property {string} city the city/town of the given street
- * @property {string} zip the zip code of the city/town of the given street
- * @property {string} lga the local government area or county of the given street
- * @property {string} state the state/region of the given street
- * @property {number} [code=234] the ISO country code where the given street is located. The default is `234`
- */
-/**
- * Parses the argument to a {@link AddressRecord js object}.
- * @callback AddressGetter
- * @param {string} param value to be parsed. This is the format that it was saved from.
- * @returns {AddressRecord} the formatted result of the argument
- */
-/**
- * 
- * Formats the argument into an internal storage format
- * @callback AddressSetter
- * @param {AddressRecord} param the structure to be formatted
- * @returns {string} the string format of the argument where each value is separated by {@linkcode US ascii unit separator}.
- */
-/**
- * @type {AddressGetter}
- */
-const g = function(x) {
-    const a = x.split(String.fromCharCode(US));
-    const streetName = a.shift();
-    let landmark = a.shift();
-    landmark = landmark.length > 0 ? landmark : null;
-    const city = a.shift();
-    const zip = a.shift();
-    const lga = a.shift();
-    const state = a.shift();
-    const code = Number.parseInt(a.shift(), 35);
-    return {
-        streetName, landmark, city, zip, lga, state, code
-    }
-}
-/**
- * @type {AddressSetter}
- */
-const s = function(x) {
-    return `${x.streetName}${String.fromCharCode(US)}${x.landmark??""}${String.fromCharCode(US)}${x.city}${String.fromCharCode(US)}${x.zip}${String.fromCharCode(US)}${x.lga}${String.fromCharCode(US)}${x.state}${String.fromCharCode(US)}${(x.code??234).toString(35)}${String.fromCharCode(US)}`;
-}
+
 /**
  * A record of key values containing mongoose configurations for the `AddressSchema`.
  * @typedef {Object} AddressSchemaConfig
  * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this address
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _a the actual address value.
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _s the street of the address value.
+ * The name of the street together with any assigned number written in a locale specific way.
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _l any landmark near the address. The
+ * alias is `landmark`. Any popular structure/edifice which can be used to identify the given street
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _c the city if the address. The
+ * alias is `city`. The city/town of the given street
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _z the zip code of the address. The
+ * alias is `zip`. The zip code of the city/town of the given street
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _lg the local government of the
+ * address. The alias is `lga`. The local government area or county of the given street
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _st the state of the address. The
+ * alias is `state`. The state/region of the given street
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _cc the country code. The alias
+ * is `countryCode`. The ISO country code where the given street is located. The default is `234`
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.Boolean, AddressSchemaConfig>} _v
  * If `true`, then this address has been verified.
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _c The comment associated with
- * this address. This may also act as a type specifier.
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AddressSchemaConfig>} _com The comment associated with
+ * this address. The alias is `comments`. This may also act as a type specifier.
  */
 /**
  * @type {AddressSchemaConfig}
  */
 const address = {
     _id: mongoose.Schema.Types.ObjectId,
-    _a: {
+    _s: {
         type: mongoose.Schema.Types.String,
-        validate: {
-            validator: function(v) {
-                return v && v.length >= 4;
-            },
-            message: function(props) {return `${props.value} is not a valid email`;}
-        },
-        get: g,
-        set: s,
-        required: true
+        trim: true,
+        minlength: 1,
+        required: true,
+        alias: "street"
+    },
+    _l: {
+        type: mongoose.Schema.Types.String,
+        trim: true,
+        minlength: 1,
+        maxlength: 20,
+        alias: "landmark"
+    },
+    _c: {
+        type: mongoose.Schema.Types.String,
+        trim: true,
+        minlength: 1,
+        maxlength: 20,
+        required: true,
+        alias: "city"
+    },
+    _z: {
+        type: mongoose.Schema.Types.String,
+        trim: true,
+        match: /^\d\d*\d$/,
+        required: true,
+        alias: "zip"
+    },
+    _lg: {
+        type: mongoose.Schema.Types.String,
+        trim: true,
+        minlength: 1,
+        required: true,
+        alias: "lga"
+    },
+    _st: {
+        type: mongoose.Schema.Types.String,
+        trim: true,
+        minlength: 1,
+        required: true,
+        alias: "state"
+    },
+    _cc: {
+        type: mongoose.Schema.Types.String,
+        trim: true,
+        match: /^\d\d\d$/,
+        default: "234",
+        alias: "countryCode"
     },
     _v: {
         type: mongoose.Schema.Types.Boolean,
         default: false
     },
-    _c: {
+    _com: {
         type: mongoose.Schema.Types.String,
+        alias: "comment",
         minlength: 1,
         trim: true
     }

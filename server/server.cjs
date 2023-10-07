@@ -4,7 +4,7 @@ const { e404, handler } = require("./controllers/middlewares/error.cjs");
 module.exports = () => {
     const bodyParser = require("body-parser");
     
-    mongoose.set("toJSON", { getters: true });
+    // mongoose.set("toJSON", { getters: true });
     mongoose.set("autoIndex", !c.inDev);
     mongoose.set("debug", c.inDev);
     

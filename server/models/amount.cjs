@@ -4,7 +4,9 @@
  * @module amount
  */
 
-import { Schema, model } from "mongoose"
+const { Schema, model } = require("mongoose");
+
+// const { Schema, model } = require("mongoose");
 
 /**
  * Amount models are meant to be immutable, hence whenever a price is changed, the old `Amount` model

@@ -121,7 +121,10 @@ const PersonNameSchema = new mongoose.Schema(name, {
         createdAt: "_cAt",
         updatedAt: "_uAt"
     },
-    versionKey: "_vk"
+    versionKey: "_vk",
+    toJSON: {
+        getters: true
+    }
 });
 /**
  * The full name of a person.
