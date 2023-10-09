@@ -39,7 +39,7 @@ const email = {
  *     versionKey: "_vk"
  * }
  * ```
- * @type {mongoose.Schema}
+ * @type {mongoose.Schema<EmailSchemaConfig>}
  */
 const EmailSchema = new mongoose.Schema(email, {
     timestamps: {
@@ -50,7 +50,8 @@ const EmailSchema = new mongoose.Schema(email, {
 });
 /**
  * The email within a contact.
+ * @type {mongoose.Model<EmailSchemaConfig>}
  */
-const Email = new mongoose.model("Email", EmailSchema);
+const Email = mongoose.model("Email", EmailSchema);
 
 module.exports = {Email, EmailSchema};

@@ -1,0 +1,8 @@
+{
+    "semi": true,
+    "embeddedLanguageFormatting": "off",
+    "trailingComma": "none",
+    "parser": "acorn",
+    "arrowParens": "avoid",
+    "useTabs": true
+}

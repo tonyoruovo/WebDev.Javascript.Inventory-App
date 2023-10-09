@@ -102,7 +102,7 @@ const address = {
  *     versionKey: "_vk"
  * }
  * ```
- * @type {mongoose.Schema}
+ * @type {mongoose.Schema<AddressSchemaConfig>}
  */
 const AddressSchema = new mongoose.Schema(address, {
     timestamps: {
@@ -113,7 +113,8 @@ const AddressSchema = new mongoose.Schema(address, {
 });
 /**
  * The address within a contact.
+ * @type {import("mongoose").Model<AddressSchemaConfig>}
  */
-const Address = new mongoose.model("Address", AddressSchema);
+const Address = mongoose.model("Address", AddressSchema);
 
 module.exports = {Address, AddressSchema};

@@ -51,6 +51,20 @@ const badReq = function (err) {
 };
 
 /**
+ * Adds a statusCode field to the error object with a value given by `cd` and throws the error. This is meant to propagate HTTP errors.
+ * @param {Error} c the cause of this `throw` clause
+ * @param {string} msg the intended message that will be prepended to the cause
+ * @param {number} cd the status code of this http error
+ * @returns {never} never returns anything
+ * @throws {Error} when this function returns
+ */
+const throws = function (c, msg, cd) {
+  c.statusCode = cd;
+  c.message = msg + "\n\n" + c.message;
+  throw c;
+}
+
+/**
  * Adds a statusCode field to the error object with a value of `401` and throws the error
  * @type {import("express").Errback}
  * @throws {Error} when this function returns
@@ -86,4 +100,5 @@ module.exports = {
   badReq,
   nAuth,
   handler,
+  throws
 };

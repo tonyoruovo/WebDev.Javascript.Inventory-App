@@ -82,6 +82,7 @@ const phone = {
  *     versionKey: "_vk"
  * }
  * ```
+ * @type {mongoose.Schema<PhoneSchemaConfig>}
  */
 const PhoneSchema = new mongoose.Schema(phone, {
     timestamps: {
@@ -93,6 +94,7 @@ const PhoneSchema = new mongoose.Schema(phone, {
 
 /**
  * The phone number of a contact.
+ * @type {mongoose.Model<PhoneSchemaConfig>}
  */
 const Phone = mongoose.model("Phone", PhoneSchema);
 

@@ -119,6 +119,9 @@ const account = {
         }
     },
 };
+/**
+ * @type {Schema<AccountSchemaConfig>}
+ */
 const AccountSchema = new Schema(account, {
     timestamps: {
         createdAt: "_cAt",
@@ -126,7 +129,9 @@ const AccountSchema = new Schema(account, {
     },
     versionKey: "_vk"
 });
-
+/**
+ * @type {import("mongoose").Model<AccountSchemaConfig>}
+ */
 const Account = model("Account", AccountSchema);
 
 module.exports = {

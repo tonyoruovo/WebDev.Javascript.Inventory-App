@@ -114,7 +114,7 @@ const name = {
  *     versionKey: "_vk"
  * }
  * ```
- * @type {mongoose.Schema}
+ * @type {mongoose.Schema<NameSchemaConfig>}
  */
 const PersonNameSchema = new mongoose.Schema(name, {
     timestamps: {
@@ -128,6 +128,7 @@ const PersonNameSchema = new mongoose.Schema(name, {
 });
 /**
  * The full name of a person.
+ * @type {mongoose.Model<NameSchemaConfig>}
  */
 const PersonName = mongoose.model("PersonName", PersonNameSchema);
 
