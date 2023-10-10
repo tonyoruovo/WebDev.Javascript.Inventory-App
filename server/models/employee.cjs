@@ -1,6 +1,5 @@
 
 const {Schema, model} = require("mongoose");
-const {RoleSchema} = require("./role.cjs");
 
 /**
  * @typedef {Object} EmployeeSchemaConfig
@@ -11,7 +10,7 @@ const {RoleSchema} = require("./role.cjs");
  * employee. The `alias` is `contact`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, EmployeeSchemaConfig>} _g gender of this employee. Valid values
  * include `male`, `female`. The `alias` is `gender`.
- * @property {import("../data/d.cjs").Options<[RoleSchema], EmployeeSchemaConfig>} _r array of roles for this employee. the `alias`
+ * @todo will add this property {import("../data/d.cjs").Options<[RoleSchema], EmployeeSchemaConfig>} _r array of roles for this employee. the `alias`
  * is `roles`.
  * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, EmployeeSchemaConfig>} _a the account of this employee. The `alias` is
  * `account` and reference is `Account`.
@@ -42,17 +41,14 @@ const employee = {
         alias: "gender",
         required: [true, "Gender is required"]
     },
-    _r: {
-        type: [RoleSchema],
-        alias: "roles"
-    },
+    // _r: {
+    //     type: [RoleSchema],
+    //     alias: "roles"
+    // },
     _a: {
         type: Schema.Types.ObjectId,
         alias: "account",
-        ref: "Account",
-        required: function(){
-            this._r.length > 0;
-        }
+        ref: "Account"
     },
     _s: {
         type: Schema.Types.Buffer,

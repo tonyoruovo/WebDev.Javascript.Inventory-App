@@ -1,6 +1,7 @@
-const { Schema } = require("mongoose");
+const { readFileSync } = require("fs");
 
-const asyncHandler = require("express-async-handler"),
+const { Types } = require("mongoose"),
+	asyncHandler = require("express-async-handler"),
 	{
 		ini,
 		strt,
@@ -23,7 +24,9 @@ const asyncHandler = require("express-async-handler"),
 	init = asyncHandler(async function (rq, rs) {
 		try {
 			await ini(rq.body.dbsession);
+			// delete rq.body.dbsession;
 			return rs.status(200).send("Session started");
+			// json({msg: "Session started",ctr: rq.body.connStr});
 		} catch (e) {
 			throws(e, "Conflict. Session initialisation failed", 409);
 		}
@@ -38,9 +41,11 @@ const asyncHandler = require("express-async-handler"),
 	start = function (rq, rs) {
 		try {
 			strt(rq.body.dbsession);
+			// delete rq.body.dbsession;
 			return rs.status(200).send("Transaction started");
+			// json({msg: "Transaction started",ctr: rq.body.connStr});
 		} catch (e) {
-			throws(e, "Gone. Unable to start transaction", 410);
+			throws(e, "Not found. Unable to start transaction", 404);
 		}
 	},
 	/**
@@ -53,9 +58,10 @@ const asyncHandler = require("express-async-handler"),
 	commit = asyncHandler(async function (rq, rs) {
 		try {
 			await cmt(rq.body.dbsession);
-			return rs.status(200).send("Transaction started");
+			// delete rq.body.dbsession;
+			return rs.status(200).send("Transaction changes committed");
 		} catch (e) {
-			throws(e, "Gone. Unable to start transaction", 410);
+			throws(e, "Not found. Unable to start transaction", 404);
 		}
 	}),
 	/**
@@ -68,6 +74,7 @@ const asyncHandler = require("express-async-handler"),
 	abort = asyncHandler(async function (rq, rs) {
 		try {
 			await abrt(rq.body.dbsession);
+			// delete rq.body.dbsession;
 			return rs.status(200).send("Transaction aborted");
 		} catch (e) {
 			throws(e, "Forbidden. Invalid action", 403);
@@ -83,6 +90,7 @@ const asyncHandler = require("express-async-handler"),
 	stop = asyncHandler(async function (rq, rs) {
 		try {
 			await end(rq.body.dbsession);
+			// delete rq.body.dbsession;
 			return rs.status(200).send("Session ended");
 		} catch (e) {
 			throws(e, "Forbidden. Invalid action", 403);
@@ -100,8 +108,13 @@ const asyncHandler = require("express-async-handler"),
 	 */
 	post = asyncHandler(async function (rq, rs) {
 		try {
-			await set(rq.body.dbsession, rq.body);
-			return rs.status(201).send("Created");
+			rq.body.dob = new Date(Date.parse(rq.body.dob));
+			rq.body.sig = readFileSync(rq.body.sig, "binary");
+
+			const e = await set(rq.body);
+			// delete rq.body.dbsession;
+			return rs.status(201).json(e);
+			// return rs.status(201).json(rq.body);
 		} catch (e) {
 			throws(e, "Forbidden. Invalid action", 403);
 		}
@@ -115,7 +128,8 @@ const asyncHandler = require("express-async-handler"),
 	 */
 	put = asyncHandler(async function (rq, rs) {
 		try {
-			await mod(rq.body.dbsession, rq.body);
+			await mod(rq.body);
+			// delete rq.body.dbsession;
 			return rs.status(204);
 		} catch (e) {
 			throws(e, "Forbidden. Invalid action", 403);
@@ -130,8 +144,8 @@ const asyncHandler = require("express-async-handler"),
 	 */
 	dlt = asyncHandler(async function (rq, rs) {
 		try {
-			if (rq.body.dbsession.is()) await del(rq.body.dbsession, rq.body);
-			else await del(undefined, rq.body);
+			await del(rq.body);
+			// delete rq.body.dbsession;
 			return rs.status(204);
 		} catch (e) {
 			throws(e, "Forbidden. Invalid action", 403);
@@ -146,21 +160,12 @@ const asyncHandler = require("express-async-handler"),
 	 */
 	get = asyncHandler(async function (rq, rs) {
 		try {
-			const id = new Schema.Types.ObjectId(rq.params.id);
-            let val;
-			if (rq.body.dbsession.is())
-				val = gt(rq.body.dbsession, {
-					$where: {
-						_id: id
-					}
-				});
-			else
-				val = gt(undefined, {
-					$where: {
-						_id: id
-					}
-				});
-			return rs.status(200).json(val);
+			// delete rq.body.dbsession;
+			return rs.status(200).json(
+				await gt({
+					_id: new Types.ObjectId(rq.params.id)
+				})
+			);
 		} catch (e) {
 			throws(e, "Forbidden. Invalid action", 403);
 		}
@@ -173,7 +178,7 @@ module.exports = {
 	abort,
 	stop,
 	post,
-    put,
-    dlt,
-    get
+	put,
+	dlt,
+	get
 };

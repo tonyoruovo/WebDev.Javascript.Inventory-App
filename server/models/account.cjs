@@ -1,28 +1,26 @@
 const { Schema, model } = require("mongoose");
 const { defMsg } = require("../data/d.cjs");
 const { v } = require("../repos/utility.cjs");
-const str = Schema.Types.String;
-const oid = Schema.Types.ObjectId;
 
 /**
  * @typedef {Object} AccountSchemaConfig
- * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this account
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AccountSchemaConfig>} _u the username. The range is [3, 24].
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AccountSchemaConfig>} _h the hashed pass.
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AccountSchemaConfig>} _s the status.
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AccountSchemaConfig>} _p the provider (for external accounts such as facebook, google, twitter).
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AccountSchemaConfig>} _pid the provider id.
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AccountSchemaConfig>} _at the provider access token.
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AccountSchemaConfig>} _rt the provider refresh token (for oauth).
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, AccountSchemaConfig>} _ats the provider access token secret (for twitter).
+ * @property {Schema.Types.ObjectId} _id the mongoose id of this account
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _u the username. The range is [3, 24].
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _h the hashed pass.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _s the status.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _p the provider (for external accounts such as facebook, google, twitter).
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _pid the provider id.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _at the provider access token.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _rt the provider refresh token (for oauth).
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _ats the provider access token secret (for twitter).
  */
 /**
  * @type {AccountSchemaConfig}
  */
 const account = {
-    _id: oid,
+    _id: Schema.Types.ObjectId,
     _u: {
-        type: str,
+        type: Schema.Types.String,
         validate: {
             validator: function(x) {
                 return v(x) && x.length >= 3 && x.length <= 24;
@@ -34,7 +32,7 @@ const account = {
         alias: "username"
     },
     _h: {
-        type: str,
+        type: Schema.Types.String,
         validate: {
             validator: function(x) {
                 return v(x) && x.length > 6;
@@ -44,12 +42,12 @@ const account = {
         required: [true, "password must be provided"]
     },
     _s: {
-        type: str,
+        type: Schema.Types.String,
         enum: ["active", "disabled", "suspended", "pending", "locked"],
         required: [true, "no status was provided"]
     },
     _p: {
-        type: str,
+        type: Schema.Types.String,
         validate: {
             validator: function(x){
                 return v(x) && x.trim().length > 0;
@@ -63,7 +61,7 @@ const account = {
         }
     },
     _pid: {
-        type: str,
+        type: Schema.Types.String,
         required: function() {
             return v(this._p);
         },
@@ -77,7 +75,7 @@ const account = {
         }
     },
     _at: {
-        type: str,
+        type: Schema.Types.String,
         required: function() {
             return v(this._p);
         },
@@ -91,7 +89,7 @@ const account = {
         }
     },
     _rt: {
-        type: str,
+        type: Schema.Types.String,
         required: function() {
             return v(this._p);
         },
@@ -105,7 +103,7 @@ const account = {
         }
     },
     _ats: {
-        type: str,
+        type: Schema.Types.String,
         required: function() {
             return v(this._p);
         },

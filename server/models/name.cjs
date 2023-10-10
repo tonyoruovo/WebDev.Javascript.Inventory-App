@@ -132,4 +132,4 @@ const PersonNameSchema = new mongoose.Schema(name, {
  */
 const PersonName = mongoose.model("PersonName", PersonNameSchema);
 
-module.exports = PersonName;
+module.exports = {PersonName, PersonNameSchema};

@@ -3,12 +3,15 @@ const { default: mongoose } = require("mongoose");
 const { e404, handler } = require("./controllers/middlewares/error.cjs");
 const bodyParser = require("body-parser");
 const { v } = require("./repos/utility.cjs");
+const morgan = require("morgan");
+const { createWriteStream } = require("fs");
+const { default: path } = require("path");
 
 /**
  * An object that retains a reference of the current session.
- * @typedef {Object} DbSession
- * @property {mongoose.mongo.Db} [db] the database connection.
- * @property {string} [n] the name of the model that created {@linkcode DbSession.s}, i.e the name of the mongodb collection that created.
+ * @typedef {Object} DbObject
+ * @property {mongoose.Connection} [con] the mongoose connection.
+ * @property {string} [n] the name of the model that created {@linkcode DbObject.s}, i.e the name of the mongodb collection that created.
  * @property {mongoose.mongo.ClientSession} [s] the session object created for this object.
  * @property {() => boolean} is checks if this has a valid session.
  * @property {() => boolean} ic checks if this has a valid connection to a database instance.
@@ -22,13 +25,15 @@ module.exports = () => {
     mongoose.set("debug", c.inDev);
 
     /**
-     * @type {DbSession}
+     * @type {DbObject}
      */
     let mog = {
-        ic: () => v(mog.db),
+        ic: () => v(mog.con),
         is: () => v(mog.n),
         end: async () => {
+            await mog.con.close();
             await mog.s.endSession();
+            mog.s = undefined;
             mog.n = undefined;
         }
     }
@@ -40,9 +45,14 @@ module.exports = () => {
     app.use(bodyParser.json());
     app.use(bodyParser.text());
     app.use(bodyParser.raw());
-    app.use(bodyParser.urlencoded());
+    app.use(bodyParser.urlencoded({extended: false}));
+    app.use(morgan("combined", {
+        stream: createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+    }));
     app.use("/api/v1/account", require("./routes/account.cjs"));
     app.use("/api/v1/cmd", require("./routes/cmd.cjs"));
+    app.use("/api/v1/product", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/product.cjs"));
+    app.use("/api/v1/employee", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/employee.cjs"));
     app.use(e404);
     app.use(handler)
     

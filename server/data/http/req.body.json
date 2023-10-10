@@ -1,0 +1,64 @@
+{
+    "dob": "1992-11-16T23:00:00.000Z",
+    "gender": "male",
+    "contact": {
+        "fullname": {
+            "name": "Anthony",
+            "surname": "Oruovo",
+            "others": [
+                "etineakpopha",
+                "tine"
+            ],
+            "preTitles": [
+                "mr",
+                "bro"
+            ],
+            "postTitles": [
+                "phd",
+                "chief"
+            ]
+        },
+        "ad": {
+            "street": "16, Dosumu street",
+            "state": "Lagos",
+            "landmark": "lawanson bus stop",
+            "city": "surulere",
+            "zip": "330011",
+            "lga": "Surulere",
+            "countryCode": "234",
+            "comments": "I don't particularly know whether surulere is a city or a local government"
+        },
+        "email": "t@gmail.com",
+        "socials": [
+            "linkedin.com/in/anthony-oruovo",
+            "twitter.com/@Aoruovo",
+            "github.com/tonyoruovo"
+        ],
+        "phone": {
+            "number": "08075912071",
+            "preference": 0,
+            "iso": "234",
+            "type": "mobile",
+            "notes": "I prefer to be contacted by whatsapp",
+            "preferredMethod": "other",
+            "pics": [
+                "C:\\Users\\Ruona Oruovo\\Desktop\\segment\\red passport 1.jpg"
+            ]
+        }
+    },
+    "ac": {
+        "username": "mathaid",
+        "password": "qwerty#123()"
+    },
+    "sig": "C:\\Users\\Ruona Oruovo\\Downloads\\Signature.jpg",
+    "connStr": {
+        "user": "maintenance",
+        "pass": "qwerty#123()"
+    },
+    "$schema": {
+        "fullname": "6525391c737e744f9824bd95",
+        "account": "6525391c737e744f9824bd97",
+        "contact": "6525391c737e744f9824bd9a",
+        "employee": "6525391c737e744f9824bd9e"
+    }
+}

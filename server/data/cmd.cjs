@@ -405,6 +405,34 @@ const listCommands = async function(p) {
 /**
  * Runs a low-level command. Please see the [database command list](https://www.mongodb.com/docs/v7.0/reference/command/)
  * for the parameter types.
+ * @example
+ * ```js
+ * // deletes an admin from the admin database
+ * db.runCommand({ delete: db.system.users.getName(), deletes: [{ q: { _id: "admin.mathaid" }, limit: 0 }] });
+ * // retrives all users from the admin database
+ * db.system.users.find({});
+ * //creates a user with (1) by reading the password from `stdin` (2) from the string value
+ * db.createUser({ user: "maintenance", pwd: passwordPrompt(), roles: [{ role: "userAdminAnyDatabase", db: "admin" }, { role: "readWriteAnyDatabase", db: "admin" }] });//(1)
+ * db.createUser({ user: "maintenance", pwd: "P@s$vv0&d", roles: [{ role: "userAdminAnyDatabase", db: "admin" }, { role: "readWriteAnyDatabase", db: "admin" }] });//(2)
+ * ```
+ * To reset the db:
+ * 1. stop the instance that is currently running.
+ * 1. go to the installation path which can be `C:\\Program Files\\MongoDB\\Server\\6.0\\bin\\mongod.cfg` and put the `#` character
+ * at the start of the line that begin with `security`. Then go to the next line and also add the `#` character to the start of the
+ * next line (this line contains something like `authorization: enabled`).
+ * 1. restart the mongodb instance see by running `mongod --dbpath C:\MongoDB\Server\6.0\data` on the command line. Leave this window
+ * running.
+ * 1. open a new command line and type `mongosh --port 27017`. It will launch mongo shell without authentication mechanisms. This is
+ * unsafe, and make sure to do this from a trusted source.
+ * 1. type in `use admin` and then press `enter`.
+ * 1. create a new user in the admin database and using any credential of your choice, but make sure to give this user a `role` such as
+ * `root`, `__system`, `dbOwner`, `userAdminAnyDatabase` or `userAdmin` and set the `db` property to `admin` for example ----
+ * `db.createUser({ user: "system", pwd: "P@s$vv0&d", roles: [{ role: "dbOwner", db: "admin" }, { role: "readWriteAnyDatabase", db: "admin" }] });`
+ * ---- This will give this user the ability to create, read, update and delete any role and/or previlege as well as create any user.
+ * 1. go back to the file at `C:\\Program Files\\MongoDB\\Server\\6.0\\bin\\mongod.cfg` and remove the `#` characters at all the
+ * locations that it was inserted in at step 2.
+ * 
+ * Now we have resetted the db. 
  * @param {CmdParam} param The db command to be run
  * @return {Promise<Record<string, any>>} a promise object with the results.
  */
@@ -415,12 +443,7 @@ const run = async function(param) {
         .connection.useDb("admin", {
             useCache: true
         }).db.admin().command(param.cmd));
-        // setImmediate(() => {
-        //     log(arguments.callee.name + ". Command successful");
-        // });
-        // return x;
     } catch(e){
-        // err(e);
         throw e;
     }
 };

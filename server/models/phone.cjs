@@ -60,7 +60,7 @@ const phone = {
         default: 0
     },
     _c: {
-        type: mongoose.Schema.String,
+        type: mongoose.Schema.Types.String,
         match: /\d{3}/g,
         default: "234",
         alias: "countryCode"
