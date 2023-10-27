@@ -1,11 +1,11 @@
 const c = require("../config.json");
-const { default: mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const { e404, handler } = require("./controllers/middlewares/error.cjs");
 const bodyParser = require("body-parser");
 const { v } = require("./repos/utility.cjs");
 const morgan = require("morgan");
 const { createWriteStream } = require("fs");
-const { default: path } = require("path");
+const {join} = require("path");
 
 /**
  * An object that retains a reference of the current session.
@@ -47,10 +47,11 @@ module.exports = () => {
     app.use(bodyParser.raw());
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(morgan("combined", {
-        stream: createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+        stream: createWriteStream(join(__dirname, 'access.log'), { flags: 'a' })
     }));
     app.use("/api/v1/account", require("./routes/account.cjs"));
     app.use("/api/v1/cmd", require("./routes/cmd.cjs"));
+    app.use("/api/v1/subject", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/subject.cjs"));
     app.use("/api/v1/product", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/product.cjs"));
     app.use("/api/v1/employee", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/employee.cjs"));
     app.use(e404);

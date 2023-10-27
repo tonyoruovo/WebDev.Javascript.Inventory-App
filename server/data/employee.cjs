@@ -1,6 +1,6 @@
 const { Types } = require("mongoose");
 const { Employee } = require("../models/employee.cjs");
-const { Contact } = require("../models/contact");
+const { Contact } = require("../models/contact.cjs");
 const { Address } = require("../models/address.cjs");
 const { Email } = require("../models/email.cjs");
 const { PersonName } = require("../models/name.cjs");
@@ -302,11 +302,11 @@ const bulkGet = p => {
  * value must be valid, else no value will be deleted.
  * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
  * multiple values.
- * @returns {any | any[]} any value
+ * @returns {Promise<any | any[]>} any value
  */
-const del = id => {
+const del = async id => {
 	if (Array.isArray(id)) return delBulk(id);
-	return Employee.findByIdAndDelete(id);
+	return await Employee.findByIdAndDelete(id).exec();
 };
 /**
  * Deletes this employees from a given session (memory) or from the {@linkcode Employee} collection.
@@ -314,12 +314,12 @@ const del = id => {
  * to be done on the {@linkcode Employee} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
  * @param {import("mongoose").Schema.Types.ObjectId[]} ids an arrays of object id of the values to be deleted
- * @returns {any[]} any value
+ * @returns {Promise<any[]>} any value
  */
-const delBulk = ids => {
+const delBulk = async ids => {
 	const docs = [];
 	for (const x of ids) {
-		docs.push(del(x));
+		docs.push(await del(x));
 	}
 	return docs;
 };

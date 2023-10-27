@@ -9,7 +9,7 @@ const { Schema, model } = require("mongoose")
  * @typedef {Object} ProductSchemaConfig
  * @property {Schema.Types.ObjectId} _id the mongoose id of this product
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ProductSchemaConfig>} _n the name of this product. The alias is `name`.
- * @property {import("../data/d.cjs").Options<Schema.Types.String, ProductSchemaConfig>} _c the category of this product. The `alias` is `category`.
+ * @property {import("../data/d.cjs").Options<[Schema.Types.String], ProductSchemaConfig>} _c the category of this product. The `alias` is `category`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ProductSchemaConfig>} _desc the description of this product. The `alias` is `description`.
  * @property {import("../data/d.cjs").Options<[Schema.Types.String], ProductSchemaConfig>} _l the array of url strings to the logo (dark, light)
  * and pictures of this product. The alias is `pics`.
@@ -32,7 +32,7 @@ const { Schema, model } = require("mongoose")
 const product = {
     _id: Schema.Types.ObjectId,
     _c: {
-        type: Schema.Types.String,
+        type: [Schema.Types.String],
         alias: "category",
         minlength: 1,
         // index: true

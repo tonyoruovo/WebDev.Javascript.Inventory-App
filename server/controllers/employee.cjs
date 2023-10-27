@@ -167,7 +167,7 @@ const { Types } = require("mongoose"),
 				})
 			);
 		} catch (e) {
-			throws(e, "Forbidden. Invalid action", 403);
+			throws(e, "Not found. Resource not found", 404);
 		}
 	});
 
