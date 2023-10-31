@@ -100,19 +100,28 @@ const order = {
         type: Schema.Types.Date,
         alias: "deliveryDate"
     },
+    // _it: {
+    //     type: [{
+    //         type: {
+    //             product: {
+    //                 type: Schema.Types.ObjectId,
+    //                 ref: "Product",
+    //                 required: true
+    //             },
+    //             quantity: {
+    //                 type: Schema.Types.Number,
+    //                 required: true,
+    //             },
+    //         }
+    //     }],
+    //     alias: "items",
+    //     required: true
+    // },
     _it: {
         type: [{
-            type: {
-                product: {
-                    type: Schema.Types.ObjectId,
-                    ref: "Product",
-                    required: true
-                },
-                quantity: {
-                    type: Schema.Types.Number,
-                    required: true,
-                },
-            }
+            type: Schema.Types.ObjectId,
+            ref: "Product",
+            required: true
         }],
         alias: "items",
         required: true
@@ -145,6 +154,7 @@ const order = {
  *     versionKey: "_vk"
  * }
  * ```
+ * @type {Schema<OrderSchemaConfig>}
  */
 const OrderSchema = new Schema(order, {
     timestamps: {
@@ -156,6 +166,7 @@ const OrderSchema = new Schema(order, {
 
 /**
  * The model for the order
+ * @type {import("mongoose").Model<OrderSchemaConfig>}
  */
 const Order = model("Order", OrderSchema);
 

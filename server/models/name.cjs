@@ -128,7 +128,7 @@ const PersonNameSchema = new mongoose.Schema(name, {
 });
 /**
  * The full name of a person.
- * @type {mongoose.Model<NameSchemaConfig>}
+ * @type {import("mongoose").Model<NameSchemaConfig>}
  */
 const PersonName = mongoose.model("PersonName", PersonNameSchema);
 

@@ -80,6 +80,7 @@ const alert = {
  *     versionKey: "_vk"
  * }
  * ```
+ * @type {Schema<AlertSchemaConfig>}
  */
 const AlertSchema = new Schema(alert, {
     timestamps: {
@@ -91,6 +92,7 @@ const AlertSchema = new Schema(alert, {
 
 /**
  * The model for the alert
+ * @type {import("mongoose").Model<AlertSchemaConfig>}
  */
 const Alert = model("Alert", AlertSchema);
 

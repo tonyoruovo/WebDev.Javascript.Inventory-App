@@ -44,7 +44,8 @@ const account = {
     _s: {
         type: Schema.Types.String,
         enum: ["active", "disabled", "suspended", "pending", "locked"],
-        required: [true, "no status was provided"]
+        required: [true, "no status was provided"],
+        default: "pending"
     },
     _p: {
         type: Schema.Types.String,
@@ -118,6 +119,16 @@ const account = {
     },
 };
 /**
+ * uses the following for the second argument:
+ * ```json
+ * {
+ *     timestamps: {
+ *         createdAt: "_cAt",
+ *         updatedAt: "_uAt"
+ *     },
+ *     versionKey: "_vk"
+ * }
+ * ```
  * @type {Schema<AccountSchemaConfig>}
  */
 const AccountSchema = new Schema(account, {
@@ -128,6 +139,7 @@ const AccountSchema = new Schema(account, {
     versionKey: "_vk"
 });
 /**
+ * The model for the account
  * @type {import("mongoose").Model<AccountSchemaConfig>}
  */
 const Account = model("Account", AccountSchema);

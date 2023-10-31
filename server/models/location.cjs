@@ -1,21 +1,27 @@
 const { Schema, model } = require("mongoose");
-const UnitSchema = new Schema({
-    value: {
-        type: Schema.Types.Number,
-        min: 0,
-        required: true
-    },
-    unit: {
-        type: Schema.Types.String,
-        required: true
-    }
-});
+// const UnitSchema = new Schema({
+//     value: {
+//         type: Schema.Types.Number,
+//         min: 0,
+//         required: true
+//     },
+//     unit: {
+//         type: Schema.Types.String,
+//         required: true
+//     }
+// });
+/**
+ * A contextual definition of a number.
+ * @typedef {Object} Unit
+ * @property {number} value the numerical value.
+ * @property {string} unit the unit in which context the value is represented.
+ */
 /**
  * @typedef {Object} LocationSchemaConfig
  * @property {Schema.Types.ObjectId} _id The mongoose id for this location.
  * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, LocationSchemaConfig>} _c the contacts of this location. The
  * alias is `contact`. The reference is `Contact`.
- * @property {import("../data/d.cjs").Options<UnitSchema, LocationSchemaConfig>} _cp the capacity of this location. This
+ * @property {import("../data/d.cjs").Options<Unit, LocationSchemaConfig>} _cp the capacity of this location. This
  * refers to maximum number of products it can store.
  * @property {import("../data/d.cjs").Options<[Schema.Types.ObjectId], LocationSchemaConfig>} _pt the payment terms for this
  * location. The alias is `paymentTerms`. The ref is `PaymentTerm`.
@@ -39,7 +45,7 @@ const location = {
         required: true
     },
     _cp: {
-        type: UnitSchema,
+        type: Schema.Types.Subdocument,
         alias: "capacity",
         required: true
     },
@@ -61,7 +67,7 @@ const location = {
     _ds: {
         type: Schema.Types.String,
         alias: "defaultStatus",
-        enum: [`pending`, `recieved`, `canceled`, `shipped`, `approved`, `in-progress`, `completed`, `failed`, 'other'],
+        enum: ["pending", "recieved", "canceled", "shipped", "approved", "in-progress", "completed", "failed", 'other'],
         default: "other"
     },
     _d: {
@@ -80,6 +86,7 @@ const location = {
  *     versionKey: "_vk"
  * }
  * ```
+ * @type {Schema<LocationSchemaConfig>}
  */
 const LocationSchema = new Schema(location, {
     timestamps: {
@@ -91,10 +98,11 @@ const LocationSchema = new Schema(location, {
 
 /**
  * The model for the location
+ * @type {import("mongoose").Model<LocationSchemaConfig>}
  */
 const Location = model("Location", LocationSchema);
-const Unit = model("Unit", UnitSchema);
+// const Unit = model("Unit", UnitSchema);
 
 module.exports = {
-    Location, LocationSchema
+    Location, LocationSchema//, Unit, UnitSchema
 }

@@ -49,8 +49,16 @@ module.exports = () => {
     app.use(morgan("combined", {
         stream: createWriteStream(join(__dirname, 'access.log'), { flags: 'a' })
     }));
-    app.use("/api/v1/account", require("./routes/account.cjs"));
+    // app.use("/api/v1/account", require("./routes/account.cjs"));
     app.use("/api/v1/cmd", require("./routes/cmd.cjs"));
+    app.use("/api/v1/transaction", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/transaction.cjs"));
+    app.use("/api/v1/report", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/report.cjs"));
+    app.use("/api/v1/amount", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/amount.cjs"));
+    app.use("/api/v1/paymentTerm", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/paymentTerm.cjs"));
+    app.use("/api/v1/order", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/order.cjs"));
+    app.use("/api/v1/alert", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/alert.cjs"));
+    app.use("/api/v1/location", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/location.cjs"));
+    app.use("/api/v1/account", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/account.cjs"));
     app.use("/api/v1/subject", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/subject.cjs"));
     app.use("/api/v1/product", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/product.cjs"));
     app.use("/api/v1/employee", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/employee.cjs"));

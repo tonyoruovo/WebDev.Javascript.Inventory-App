@@ -80,6 +80,7 @@ const amount = {
  *       granularity: "seconds"
  *   }
  * ```
+ * @type {Schema<AmountSchemaConfig>}
  */
 const AmountSchema = new Schema(amount, {
     timestamps: {
@@ -96,6 +97,7 @@ const AmountSchema = new Schema(amount, {
 
 /**
  * The model for the amount schema
+ * @type {import("mongoose").Model<AmountSchemaConfig>}
  */
 const Amount = model("Amount", AmountSchema);
 

@@ -26,7 +26,8 @@ const {AddressSchema} = require("./address.cjs");
  * allows you to specify the preferred method of contact for the contact or organization. This could be email, phone, fax, or any
  * other communication channel they prefer. If this value is `social` or `other` then it should be specified in the `comments`
  * property. the `alias` is `mode`.
- * @property {import("../data/d.cjs").Options<[mongoose.Schema.Types.String], ContactSchemaConfig>} _pp url to the profile picture(s). The `alias` is `profilePics`.
+ * @property {import("../data/d.cjs").Options<[mongoose.Schema.Types.String], ContactSchemaConfig>} _pp url to the profile picture(s).
+ * The `alias` is `profilePics`.
  */
 /**
  * @type {ContactSchemaConfig}

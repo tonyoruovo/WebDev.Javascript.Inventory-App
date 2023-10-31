@@ -17,7 +17,7 @@ const email = {
     _e: {
         type: mongoose.Schema.Types.String,
         trim: true,
-        match: /.*@.*/g,
+        match: /.+@.+/g,
         minlength: 3,
         unique: true,
         required: true,

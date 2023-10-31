@@ -1,6 +1,6 @@
-const { get, remove, post, update } = require("../controllers/account.cjs");
+const { get, remove, post, update } = require("../controllers/transaction.cjs");
 /**
- * Multiple routes that are logically related to account data
+ * Multiple routes that are logically related to transaction data
  */
 const router = require("express").Router();
 

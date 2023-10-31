@@ -108,6 +108,7 @@ const paymentTerm = {
  *     versionKey: "_vk"
  * }
  * ```
+ * @type {Schema<PaymentTermSchemaConfig>}
  */
 const PaymentTermSchema = new Schema(paymentTerm, {
     timestamps: {
@@ -118,6 +119,7 @@ const PaymentTermSchema = new Schema(paymentTerm, {
 });
 /**
  * The model for the payment term
+ * @type {import("mongoose").Model<PaymentTermSchemaConfig>}
  */
 const PaymentTerm = model("PaymentTerm", PaymentTermSchema);
 

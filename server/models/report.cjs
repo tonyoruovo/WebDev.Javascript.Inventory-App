@@ -8,7 +8,7 @@ const { Schema, model } = require("mongoose");
  * alias is `message`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ReportSchemaConfig>} _t the type of report. valid values are
  * `inventory-status`, `sales`, `purchases`, `financial`, `inventory-valuation`, `stock-reorder`, `product-movement`,
- * `custom-report`. The alias is `reportType`.\
+ * `custom`. The alias is `reportType`.\
  * \
  * In the context of the "Report Model" within an inventory management system, the "Type" attribute typically refers to the
  * categorization or classification of reports based on their nature or purpose. The "Type" property helps differentiate different
@@ -76,12 +76,12 @@ const report = {
     },
     _pf: {
         type: [{
-            type: Schema.Types.String,
+            type: Schema.Types.Mixed,
             validate: {
-                validator: function(x) {
-                    return x.indexOf(".") < 0;
+                validator: function(o) {
+                    return (typeof o.modelName) === "string" && o.modelName.length > 0 && Array.isArray(o.path) && o.path.every(y => y.indexOf('.') < 0);
                 },
-                message: function(x){
+                message: function(){
                     return 'cannot have a "." in any path';
                 }
             },
@@ -94,7 +94,7 @@ const report = {
         type: Schema.Types.String,
         required: true,
         alias: "reportType",
-        enum: ["inventory-status", "sales", "purchases", "financial", "inventory-valuation", "stock-reorder", "product-movement", "custom-report"]
+        enum: ["inventory-status", "sales", "purchases", "financial", "inventory-valuation", "stock-reorder", "product-movement", "custom"]
     }
 }
 
@@ -109,6 +109,7 @@ const report = {
  *     versionKey: "_vk"
  * }
  * ```
+ * @type {Schema<ReportSchemaConfig>}
  */
 const ReportSchema = new Schema(report, {
     timestamps: {
@@ -120,6 +121,7 @@ const ReportSchema = new Schema(report, {
 
 /**
  * The model for the report
+ * @type {import("mongoose").Model<ReportSchemaConfig>}
  */
 const Report = model("Report", ReportSchema);
 
