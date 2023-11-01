@@ -24,9 +24,29 @@
 // }
 const asyncHandler = require("express-async-handler");
 const { throws } = require("./middlewares/error.cjs");
-const {add, mod, ret, rem} = require("../data/account.cjs");
+const {add, mod, ret, rem, login, logout} = require("../data/account.cjs");
 const { Types } = require("mongoose");
 
+const signout = asyncHandler(async function(rq, rs) {
+    try {
+        rs.status(200).json(await logout({
+            _id: new Types.ObjectId(rq.params.id)
+        }));
+    } catch (e) {
+        throws(e, "Not Found. The resource requested was unavailable", 404);
+    }
+});
+
+const signin = asyncHandler(async function(rq, rs) {
+    try {
+        const e = await login({})
+        rs.status(200).json(await login({
+            _id: new Types.ObjectId(rq.params.id),
+        }));
+    } catch (e) {
+        throws(e, "Not Found. The resource requested was unavailable", 404);
+    }
+});
 
 const get = asyncHandler(async function(rq, rs) {
     try {
@@ -63,5 +83,5 @@ const remove = asyncHandler(async function(rq, rs) {
 });
 
 module.exports = {
-    get, post, update, remove
+    get, post, update, remove, signin, signout
 }

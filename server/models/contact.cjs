@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const {EmailSchema} = require("./email.cjs");
 const {Phone} = require("./phone.cjs");
 const {Address} = require("./address.cjs");
 const { Name } = require("./name.cjs");
@@ -105,14 +104,6 @@ const contact = {
     _pp: {
         type: [mongoose.Schema.Types.String],
         alias: "profilePics"
-    },
-    _e: {
-        type: [EmailSchema],
-        // ref: "Email",
-        alias: "emails",
-        required: [function() {
-            return this.numbers === null || this.numbers === undefined || this.numbers.length === 0;
-        }, "email or phone number is needed"]
     },
     _p: {
         type: [{

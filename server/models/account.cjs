@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const { defMsg } = require("../data/d.cjs");
 const { v } = require("../repos/utility.cjs");
+const { Email } = require("./email.cjs");
 
 /**
  * @typedef {Object} AccountSchemaConfig
@@ -20,19 +21,23 @@ const { v } = require("../repos/utility.cjs");
  */
 const account = {
     _id: Schema.Types.ObjectId,
-    _e: [{
-        type: Schema.Types.ObjectId,
-        ref: "Email",
-        alias: "email",
-        validate: {
-            validator: async function(x) {
-                return v(await Account.findById(x).exec());
-            },
-            message: function(x) {
-                return `${x} does not exists`;
+    _e: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: "Email",
+            required: true,
+            validate: {
+                validator: async function(x) {
+                    return v(await Email.findById(x).exec());
+                },
+                message: function(x) {
+                    return `${x} does not exists`;
+                }
             }
-        }
-    }],
+        }],
+        alias: "emails",
+        required: [true, "email or phone number is needed"]
+    },
     _u: {
         type: Schema.Types.String,
         validate: {

@@ -1,6 +1,6 @@
-
 const { Types } = require("mongoose");
 const { Account } = require("../models/account.cjs");
+const jwt = require("jsonwebtoken");
 /**
  * @typedef {Object} AccountRef
  * @property {Types.ObjectId} account
@@ -26,39 +26,42 @@ const { Account } = require("../models/account.cjs");
  * @returns {Promise<AccountRef | AccountRef[]>} a promise of references to the saved data.
  */
 const add = async p => {
-    if(Array.isArray(p)) return await bulkAdd(p);
+	if (Array.isArray(p)) return await bulkAdd(p);
 
-    const _ = {};
+	const _ = {};
 
-    _.account = (await new Account({
-        _at: p.at,
-        _ats: p.ats,
-        _h: p.unhashed,
-        _id: new Types.ObjectId(),
-        _p: p.p,
-        _pid: p.pid,
-        _rt: p.rt,
-        _u: p.username,
-        _e: new Types.ObjectId(p.email || p.e)
-    }).save())._id;
+	_.email = new Types.ObjectId(p.email || p.e);
 
-    return _;
-}
+	_.account = (
+		await new Account({
+			_at: p.at,
+			_ats: p.ats,
+			_h: p.unhashed,
+			_id: new Types.ObjectId(),
+			_p: p.p,
+			_pid: p.pid,
+			_rt: p.rt,
+			_u: p.username,
+			_e: _.email
+		}).save()
+	)._id;
+
+	return _;
+};
 /**
  * Adds the given accounts to the {@linkcode Account} collection.
  * @param {AccountDoc[]} p the values to be added to the collection.
  * @returns {Promise<AccountRef[]>} a promise of references to the saved data.
  */
 const bulkAdd = async p => {
-    const docs = [];
-    for(const s of p){
-        try {
-            docs.push(await add(s));
-        } catch (e) {
-        }
-    }
-    return docs;
-}
+	const docs = [];
+	for (const s of p) {
+		try {
+			docs.push(await add(s));
+		} catch (e) {}
+	}
+	return docs;
+};
 /**
  * Retrieves this account's details from a given session (memory) or from the {@linkcode Account} collection.
  * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Account}
@@ -68,26 +71,23 @@ const bulkAdd = async p => {
  * an object with the account id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-    if(Array.isArray(p)) return await bulkRet(p);
-    return await Account.findOne(p)
-    .select("-_id -_cAt -_uAt -_vk")
-    .exec();
-}
+	if (Array.isArray(p)) return await bulkRet(p);
+	return await Account.findOne(p).select("-_id -_cAt -_uAt -_vk").exec();
+};
 /**
  * Retrieves the details of the given account using the array of queries to execute for each of the item to get.
  * @param {Record<string, any>[]} p An array of mongoose queries which will be executed one after the other
  * @returns {Promise<import("../models/account.cjs").AccountSchemaConfig[]>} An array of account data for every sucessful query.
  */
 const bulkRet = async p => {
-    const docs = [];
-    for(const s of p){
-        try {
-            docs.push(await ret(s));
-        } catch (e) {
-        }
-    }
-    return docs;
-}
+	const docs = [];
+	for (const s of p) {
+		try {
+			docs.push(await ret(s));
+		} catch (e) {}
+	}
+	return docs;
+};
 
 /**
  * Deletes this account from a given session (memory) or from the {@linkcode Account} collection.
@@ -128,9 +128,24 @@ const remBulk = async ids => {
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, AccountSchemaConfig> & AccountSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/account.cjs").AccountSchemaConfig>>} an object with the account id
  */
 const mod = async p => {
-    return await Account.findByIdAndUpdate(p.id, p.query);
+	return await Account.findByIdAndUpdate(p.id, p.query);
 };
 
-module.exports = {
-    add, mod, rem, ret
+/**
+ * Generates a jwt and returns it as a jwt authorization header compatible `string`
+ * @param {string} id the id of the user to which this token is assigned
+ * @param {string} token the JSON Web token key with which a token will be generated
+ * @returns { string } a string representing the jwt
+ */
+function generateToken(id, token) {
+  return jwt.sign({ id }, token, {
+    expiresIn: 15 * 60,
+  });
 }
+
+module.exports = {
+	add,
+	mod,
+	rem,
+	ret
+};
