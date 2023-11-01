@@ -1,7 +1,6 @@
 
 const { Types } = require("mongoose");
 const { Transaction } = require("../models/transaction.cjs");
-const { Amount } = require("../models/amount.cjs");
 
 /**
  * An object containing reference(s) to composite types stored against an transaction in the {@linkcode Transaction} collection.
@@ -15,7 +14,7 @@ const { Amount } = require("../models/amount.cjs");
  * @property {string} e The id of the employee that approved (is responsible for) this transaction
  * @property {string} l The id of the location from which this product will be shipped.
  * @property {string} oid The id of the order to which this transaction is responding to.
- * @property {import("../data/amount.cjs").AmountDoc[]} amounts additional transaction-wide deductions, promos.
+ * @property {string[]} amounts {@linkcode Types.ObjectId} as a string representing additional transaction-wide deductions, promos.
  */
 /**
  * Adds the given transaction to the {@linkcode Transaction} collection.
@@ -27,22 +26,13 @@ const add = async p => {
 
     const _ = {};
 
-    const as = p.amounts.map(x => new Amount({
-        _cc: x.iso,
-        _ct: x.comment || x.comments,
-        _expiresAt: x.expiresAt,
-        _id: new Types.ObjectId(),
-        _t: x.type,
-        _v: x.value
-    }));
-
     _.transaction = ((await new Transaction({
         _id: new Types.ObjectId(),
         _c: p.msg,
         _e: new Types.ObjectId(p.e),
         _l: new Types.ObjectId(p.l),
         _oid: new Types.ObjectId(p.oid),
-        _ta: as,
+        _ta: p.amounts.map(x => new Types.ObjectId(x)),
     }).save())._id);
 
     return _;

@@ -1,5 +1,6 @@
 const {Schema, model} = require("mongoose");
-const {AmountSchema} = require("./amount.cjs");
+const { Amount } = require("./amount.cjs");
+const { v } = require("../repo/utility.cjs");
 
 /**
  * In the context of a "Supplier Model" in an inventory management system, "Payment terms" refer to the agreed-upon conditions and
@@ -49,7 +50,7 @@ const {AmountSchema} = require("./amount.cjs");
  * @property {import("../data/d.cjs").Options<Schema.Types.String, PaymentTermSchemaConfig>} _tc the terms and conditions of the
  * payment period interval. The alias is `tAndC`. This includes when the payment method is specified as `others`, as it is expected
  * that the details are given here.
- * @property {import("../data/d.cjs").Options<[AmountSchema], PaymentTermSchemaConfig>} _a amounts. This includes base cost/bill
+ * @property {import("../data/d.cjs").Options<[Schema.Types.ObjectId], PaymentTermSchemaConfig>} _a amounts. This includes base cost/bill
  * and any additional fees, taxes, charges and/or discounts. The alias is `amounts`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, PaymentTermSchemaConfig>} _ty the payment type. The alias is
  * `paymentType`. Includes `cheque`, `check`, `cash`, `wire`, `credit`, `etf` (`paypal`, `verve`, `interswitch`, `crypto` etc).
@@ -80,7 +81,18 @@ const paymentTerm = {
         required: true
     },
     _a: {
-        type: [AmountSchema],
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: "Amount",
+            validate: {
+                validator: async function(x) {
+                    return v(await Amount.findById(x).exec());
+                },
+                message: function(x) {
+                    return `${x} does not exists as an amount`;
+                }
+            }
+        }],
         alias: "amounts"
     },
     _ty: {

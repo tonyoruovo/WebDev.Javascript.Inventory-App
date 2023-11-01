@@ -1,12 +1,5 @@
 const { Types } = require("mongoose");
 const { Employee } = require("../models/employee.cjs");
-const { Contact } = require("../models/contact.cjs");
-const { Address } = require("../models/address.cjs");
-const { Email } = require("../models/email.cjs");
-const { PersonName } = require("../models/name.cjs");
-const { Phone } = require("../models/phone.cjs");
-const { Account } = require("../models/account.cjs");
-const { v } = require("../repos/utility.cjs");
 
 /**
  * A reference to a created {@linkcode Employee} model inside a transaction that is yet to saved and committed.
@@ -21,48 +14,15 @@ const { v } = require("../repos/utility.cjs");
  * Employee.findOne({_id: ef.employee}: Record<string, any>).session(s).save();
  * ```
  * @typedef {Object} EmployeeRef
- * @property {import("mongoose").Schema.Types.ObjectId} fullname a reference to a {@linkcode PersonName} model that is yet to be saved
- * @property {import("mongoose").Schema.Types.ObjectId} account a reference to an {@linkcode Account} model that is yet to be saved
- * @property {import("mongoose").Schema.Types.ObjectId} contact a reference to a {@linkcode Contact} model that is yet to be saved
+ * @property {import("mongoose").Schema.Types.ObjectId} subject a reference to a `Subject` model that is yet to be saved
  * @property {import("mongoose").Schema.Types.ObjectId} employee a reference to an {@linkcode Employee} model that is yet to be saved
  */
 /**
  * A js object with the neccessary properties for creating an {@link Employee}.
  * @typedef {Object} EmployeeDoc
- * @property {Date} dob the date of birth
- * @property {"male" | "female"} gender the gender of the employee
- * @property {Object} contact the contact of this employee
- * @property {Object} contact.fullname the fullname of this employee
- * @property {string} contact.fullname.name the first name of this employee
- * @property {string[]} [contact.fullname.others] middle names and other names that are not the first name, surname or title of this
- * individual.
- * @property {string} contact.fullname.surname the surname of this employee
- * @property {string[]} [contact.fullname.preTitles] the titles of this employee that may be prepended to the fullname
- * @property {string[]} [contact.fullname.postTitles] the titles of this employee that may be appended to the fullname
- * @property {Object} contact.ad the address data of the employee
- * @property {string} contact.ad.street the street of the employee
- * @property {string} [contact.ad.landmark] any landmark useful in identifying the street of the employee
- * @property {string} contact.ad.city the city where the street of the employee resides.
- * @property {string} contact.ad.zip the zip code of the city where the street of the employee resides.
- * @property {string} contact.ad.lga the local government area of the city where the street of the employee resides.
- * @property {string} contact.ad.state the state or region where the city of the employee resides.
- * @property {string} contact.ad.countryCode the country where the employee resides.
- * @property {string} contact.ad.comments any neccessary comments.
- * @property {string} contact.email The email of this employee.
- * @property {string[]} contact.socials The urls to social media account of this employee.
- * @property {Object} contact.phone The phone number of this employee.
- * @property {string} contact.phone.number The locale specific phone number of this employee without any international code
- * preceding it.
- * @property {number} contact.phone.preference The preference of this phone number.
- * @property {string} contact.phone.iso The 3-letter country code of this phone number.
- * @property {"mobile" | "home" | "work" | "fax" | "emergency" | "main" | "alt" | "sec" | "direct" | "customer-support" | "sales" | "billing" | "technical-support" | "vendor" | "supplier" | "personal" | "other"} contact.phone.type The type of this phone number, which maybe work, personal home etc.
- * @property {string} contact.notes Addtional neccessary info about this contact.
- * @property {"call" | "sms" | "email" | "social" | "other"} contact.preferredMethod The preferred way in which the owner wants to be contacted.
- * @property {string[]} contact.pics The internal url to prfile pictures.
- * @property {Object} ac the account data of the employee
- * @property {string} ac.username the username
- * @property {string} ac.password the password
- * @property {Buffer} [sig] the signature of this employee
+ * @property {string} [sig] the image data of the signature of this employee as a `string`.
+ * @property {string} subject {@linkcode Types.ObjectId} as a string representing the signature of this employee.
+ * @property {string} s alias for {@linkcode EmployeeDoc.subject}
  */
 /**
  * Creates a new employee in memory. This does not save this object to the database. That must be done in a separate action,
@@ -77,147 +37,16 @@ const set = async p => {
 	if (Array.isArray(p)) {
 		return await bulkSet(p);
 	}
-	const ad = new Address({
-		_id: new Types.ObjectId(),
-		_c: p.contact.ad.city,
-		_cc: p.contact.ad.countryCode ?? p.contact.phone.iso,
-		_com: p.contact.ad.comments,
-		_l: p.contact.ad.landmark,
-		_lg: p.contact.ad.lga,
-		_s: p.contact.ad.street,
-		_st: p.contact.ad.state,
-		_z: p.contact.ad.zip
-	});
-	const email = new Email({ _e: p.contact.email, _id: new Types.ObjectId() });
-	const phone = new Phone({
-		_id: new Types.ObjectId(),
-		_c: p.contact.phone.iso ?? p.contact.ad.countryCode,
-		_n: p.contact.phone.number,
-		_pf: p.contact.phone.preference,
-		_t: p.contact.phone.type.toLowerCase()
-	});
 
 	const _ = {};
-	try {
-		_.fullname = (
-			await new PersonName({
-				_id: new Types.ObjectId(),
-				_n: {
-					name: p.contact.fullname.name,
-					surname: p.contact.fullname.surname,
-					others: p.contact.fullname.others,
-					preTitles: p.contact.fullname.preTitles,
-					postTitles: p.contact.fullname.postTitles
-				}
-			}).save()
-		)._id;
-	} catch (e) {
-		throw e;
-	}
 
-	try {
-		if (
-			v(
-				Account.findOne({
-					_u: p.ac.username
-				})
-					.select("_u")
-					.exec()._u
-			)
-		) {
-			await PersonName.findByIdAndDelete(_.fullname).exec();
-			throw Error("Duplicate username found");
-		}
-		_.account = (
-			await new Account({
-				_id: new Types.ObjectId(),
-				_h: p.ac.password,
-				_s: "pending",
-				_u: p.ac.username
-			}).save()
-		)._id;
-	} catch (e) {
-		await PersonName.findByIdAndDelete(_.fullname).exec();
-		throw e;
-	}
+	_.subject = new Types.ObjectId(p.subject);
 
-	try {
-		if (
-			v(
-				Contact.findOne({
-					"_e._e": p.contact.email
-				})
-					.select("_e.e")
-					.exec()._e
-			)
-		) {
-			await PersonName.findByIdAndDelete(_.fullname).exec();
-			await Account.findByIdAndDelete(_.account).exec();
-			throw Error("Duplicate email found");
-		}
-		if (
-			v(
-				Contact.findOne({
-					"_p._n": p.contact.phone.number
-				})
-					.select("_p._n")
-					.exec()._p
-			)
-		) {
-			await PersonName.findByIdAndDelete(_.fullname).exec();
-			await Account.findByIdAndDelete(_.account).exec();
-			throw Error("Duplicate phone number found");
-		}
-		_.contact = (
-			await new Contact({
-				_id: new Types.ObjectId(),
-				_nt: p.contact.notes,
-				_pm: p.contact.preferredMethod,
-				_pp: p.contact.pics,
-				_s: p.contact.socials,
-				_a: [ad],
-				_e: [email],
-				_n: _.fullname,
-				_p: [phone]
-			}).save()
-		)._id;
-	} catch (e) {
-		await PersonName.findByIdAndDelete(_.fullname).exec();
-		await Account.findByIdAndDelete(_.account).exec();
-		throw e;
-	}
-
-	try {
-		if (
-			v(
-				Employee.findOne({
-					_s: p.sig
-				})
-					.select("_s")
-					.exec()._s
-			)
-		) {
-			await PersonName.findByIdAndDelete(_.fullname).exec();
-			await Account.findByIdAndDelete(_.account).exec();
-			await Contact.findByIdAndDelete(_.contact).exec();
-			throw Error("Duplicate signature found");
-		}
-		_.employee = (
-			await new Employee({
-				_id: new Types.ObjectId(),
-				_g: p.gender.toLowerCase(),
-				_dob: p.dob,
-				_s: p.sig,
-				_a: _.account,
-				_c: _.contact
-			}).save()
-		)._id;
-	} catch (e) {
-		await PersonName.findByIdAndDelete(_.fullname).exec();
-		await Account.findByIdAndDelete(_.account).exec();
-		await Contact.findByIdAndDelete(_.contact).exec();
-		throw e;
-	}
+	_.employee = (await new Employee({
+		_id: new Types.ObjectId(),
+		_s: _.subject,
+		_sig: Buffer.from(p.sig, "binary")
+	}).save())._id;
 
 	return _;
 };

@@ -3,6 +3,9 @@ const asyncHandler = require("express-async-handler");
 const { throws } = require("./middlewares/error.cjs");
 const {add, mod, ret, rem} = require("../data/transaction.cjs");
 const { Types } = require("mongoose");
+/**
+ * @typedef {import("../data/transaction.cjs").TransactionDoc} PostBody
+ */
 
 
 const get = asyncHandler(async function(rq, rs) {
@@ -14,6 +17,13 @@ const get = asyncHandler(async function(rq, rs) {
         throws(e, "Not Found. The resource requested was unavailable", 404);
     }
 });
+/**
+ * Creates a transaction
+ * @method POST
+ * @access protected admins only
+ * @route /api/v1/transaction/add
+ * @type {import("./middlewares/d.cjs").Middleware<undefined, PostBody, Record<string, any>, undefined>}
+ */
 const post = asyncHandler(async function(rq, rs) {
     try {
         const e = await add(rq.body);

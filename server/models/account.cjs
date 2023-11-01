@@ -5,6 +5,7 @@ const { v } = require("../repos/utility.cjs");
 /**
  * @typedef {Object} AccountSchemaConfig
  * @property {Schema.Types.ObjectId} _id the mongoose id of this account
+ * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, AccountSchemaConfig>} _e the email.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _u the username. The range is [3, 24].
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _h the hashed pass.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _s the status.
@@ -19,6 +20,19 @@ const { v } = require("../repos/utility.cjs");
  */
 const account = {
     _id: Schema.Types.ObjectId,
+    _e: [{
+        type: Schema.Types.ObjectId,
+        ref: "Email",
+        alias: "email",
+        validate: {
+            validator: async function(x) {
+                return v(await Account.findById(x).exec());
+            },
+            message: function(x) {
+                return `${x} does not exists`;
+            }
+        }
+    }],
     _u: {
         type: Schema.Types.String,
         validate: {

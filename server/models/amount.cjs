@@ -12,7 +12,7 @@ const { Schema, model } = require("mongoose");
  * Amount models are meant to be immutable, hence whenever a price is changed, the old `Amount` model
  * should be replaced with the new one as opposed to mutating an existing one and saving it.
  * @typedef {Object} AmountSchemaConfig
- * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this amount
+ * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this amount.
  * @property {import("../data/d.cjs").Options<Schema.Types.Date, AmountSchemaConfig>} _expiresAt the duration of this amount
  * (for time sensitive amounts). Set to a very distant future (e.g 1000 years) to gain a permanent effect.
  * @property {import("../data/d.cjs").Options<Schema.Types.Number, AmountSchemaConfig>} _v the actual amount value. The
@@ -59,9 +59,9 @@ const amount = {
     _expiresAt: {
         type: Schema.Types.Date,
         default: Date.now,
-        index: {
-            expires: '0s'
-        }
+        // index: {
+        //     expires: '0s'
+        // }
     }
 }
 /**
@@ -88,11 +88,11 @@ const AmountSchema = new Schema(amount, {
         updatedAt: "_uAt"
     },
     versionKey: "_vk",
-    timeseries: {
-        timeField: "_expiresAt",
-        metaField: "_v",
-        granularity: "seconds"
-    }
+    // timeseries: {
+    //     timeField: "_expiresAt",
+    //     metaField: "_v",
+    //     granularity: "seconds"
+    // }
 });
 
 /**

@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 const {EmailSchema} = require("./email.cjs");
-const {PhoneSchema} = require("./phone.cjs");
-const {AddressSchema} = require("./address.cjs");
+const {Phone} = require("./phone.cjs");
+const {Address} = require("./address.cjs");
+const { Name } = require("./name.cjs");
+const { v } = require("../repo/utility.cjs");
+const { Account } = require("./account.cjs");
 
 /**
  * A record of key values containing mongoose configurations for the `ContactSchema`.
@@ -12,13 +15,11 @@ const {AddressSchema} = require("./address.cjs");
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.ObjectId, ContactSchemaConfig>} _n the personal name of the
  * contact. If the `companyName` is present, then this is the name of the genaral manager in-charge. This is a reference to a
  * `PersonName` model. The `alias` is `name`.
- * @property {import("../data/d.cjs").Options<[AddressSchema], ContactSchemaConfig>} _a the address of this contact. The `alias` is `addresses`.
- * @property {import("../data/d.cjs").Options<[EmailSchema], ContactSchemaConfig>} _e the email of this contact. The `alias` is `emails`. No need for references as explicitly
- * uses the {@linkcode EmailSchema} in it's type.
+ * @property {import("../data/d.cjs").Options<[mongoose.Schema.Types.ObjectId], ContactSchemaConfig>} _a the addresses of this contact. The `alias` is `addresses`. The ref is `Address`.
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.ObjectId, ContactSchemaConfig>} _ac the account of this contact. The `alias` is `account`. The ref is `Account`.
  * @property {import("../data/d.cjs").Options<[mongoose.Schema.Types.String], ContactSchemaConfig>} _w the websites of this contact. The `alias` is `websites`
  * @property {import("../data/d.cjs").Options<[mongoose.Schema.Types.String], ContactSchemaConfig>} _s the social media of this contact. The `alias` is `socials`
- * @property {import("../data/d.cjs").Options<[PhoneSchema], ContactSchemaConfig>} _p the phone numbers of this contact. The `alias` is `numbers`. No need for references as explicitly
- * uses the {@linkcode PhoneSchema} in it's type.
+ * @property {import("../data/d.cjs").Options<[mongoose.Schema.Types.ObjectId], ContactSchemaConfig>} _p the phone numbers of this contact. The `alias` is `numbers`. The ref is `Phone`.
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, ContactSchemaConfig>} _nt This field can be a free-text
  * area where you can add any additional notes, comments, or specific instructions related to the contact. It's useful for adding
  * contextual information that might not fit neatly into other fields. The `alias` is `comments`.
@@ -44,17 +45,50 @@ const contact = {
     },
     _n: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "PersonName",
+        ref: "Name",
         alias: "name",
         required: [function() {
             return this._com_n === null || this._com_n === undefined;
-        }, "'name' and 'companyName' cannot both be empty"]
+        }, "'name' and 'companyName' cannot both be empty"],
+        validate: {
+            validator: async function(x) {
+                return v(await Name.findById(x).exec());
+            },
+            message: function(x) {
+                return `${x} does not exists as a name`;
+            }
+        }
     },
     _a: {
-        type: [AddressSchema],
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Address",
+            validate: {
+                validator: async function(x) {
+                    return v(await Address.findById(x).exec());
+                },
+                message: function(x) {
+                    return `${x} does not exists in address`;
+                }
+            }
+        }],
         // ref: "Address",
         alias: "addresses",
         required: [true, "Address is required"]
+    },
+    _ac: {
+        type: mongoose.Schema.Types.ObjectId,
+        alias: "account",
+        ref: "Account",
+        required: true,
+        validate: {
+            validator: async function(x) {
+                return v(await Account.findById(x).exec());
+            },
+            message: function(x) {
+                return `${x} does not exists`;
+            }
+        }
     },
     _w: {
         type: [mongoose.Schema.Types.String],
@@ -81,8 +115,18 @@ const contact = {
         }, "email or phone number is needed"]
     },
     _p: {
-        type: [PhoneSchema],
-        // ref: "Phone",
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Phone",
+            validate: {
+                validator: async function(x) {
+                    return v(await Phone.findById(x).exec());
+                },
+                message: function(x) {
+                    return `${x} does not exists`;
+                }
+            }
+        }],
         alias: "numbers",
         required: [function() {
             return this.emails === null || this.emails === undefined || this.emails.length === 0;

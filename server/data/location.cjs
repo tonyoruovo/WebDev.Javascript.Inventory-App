@@ -1,8 +1,6 @@
 
 const { Types } = require("mongoose");
 const { Location } = require("../models/location.cjs");
-const { PaymentTerm } = require("../models/paymentTerm.cjs");
-const { Amount } = require("../models/amount.cjs");
 /**
  * An object containing reference(s) to composite types stored against a location in the {@linkcode Location} collection.
  * @typedef {Object} LocationRef
@@ -17,9 +15,10 @@ const { Amount } = require("../models/amount.cjs");
  * @property {string} contact the id of the contact within the contact collection.
  * @property {string} descr any relevant description for this location.
  * @property {string[]} pics urls to the photos of this location.
+ * @property {string} sig signature of the employee in-charge of this location.
  * @property {"pending" | "recieved" | "canceled" | "shipped" | "approved" | "in-progress" | "completed" | "failed" | "other"} [defaultStatus="other"] the default status for  this location.
  * @property {import("../models/location.cjs").Unit} capacity the capacity of this location.
- * @property {import("./subject.cjs").PaymentTermDoc[]} pts the payment terms
+ * @property {string[]} pts an array of {@linkcode Types.ObjectId} objects as strings representing the payment terms
  */
 /**
  * Adds the given location to the {@linkcode Location} collection.
@@ -31,29 +30,7 @@ const add = async p => {
 
     const _ = {};
 
-    _.paymentTerms = [];
-    for(const pt of p.pts){
-        const as = [];
-        for (const a of pt.amounts) {
-            as.push(new Amount({
-                _cc: a.iso || "566",
-                _ct: a.comments || a.comment,
-                _expiresAt: a.expiresAt,
-                _id: new Types.ObjectId(),
-                _t: a.type || "add",
-                _v: a.value
-            }));
-        }
-        _.paymentTerms.push((await new PaymentTerm({
-            _id: new Types.ObjectId(),
-            _a: as,
-            _ic: pt.codes,
-            _it: pt.interval,
-            _prd: pt.period,
-            _tc: pt.t_c,
-            _ty: pt.paymentType
-        }).save())._id);
-    }
+    _.paymentTerms = p.pts.map(x => new Types.ObjectId(x));
 
     _.contact = new Types.ObjectId(p.contact);
 
@@ -64,7 +41,8 @@ const add = async p => {
         _ds: p.defaultStatus,
         _id: new Types.ObjectId(),
         _pc: p.pics,
-        _pt: _.paymentTerms
+        _pt: _.paymentTerms,
+        _s: Buffer.from(p.sig, "binary")
     }).save())._id;
 
     return _;

@@ -4,12 +4,15 @@ const { Account } = require("../models/account.cjs");
 /**
  * @typedef {Object} AccountRef
  * @property {Types.ObjectId} account
+ * @property {Types.ObjectId} email
  */
 /**
  * An object whose properties map to the {@linkcode Account} model, as such, is used to instantiate the model, which is stored in
  * an `Account` collection afterwards.
  * @typedef {Object} AccountDoc
  * @property {string} username the username of this account. The range is [3, 24].
+ * @property {string} e an alias for {@linkcode AccountDoc.email}.
+ * @property {string} email {@linkcode Types.ObjectId} as a string representing the email of this account.
  * @property {string} [unhashed] the unhashed password of this account. For internal accounts, this is required.
  * @property {string} [p] the external provider such as facebook, google, twitter. For external accounts, this is required.
  * @property {string} [pid] the external provider. For external accounts, this is required.
@@ -35,7 +38,8 @@ const add = async p => {
         _p: p.p,
         _pid: p.pid,
         _rt: p.rt,
-        _u: p.username
+        _u: p.username,
+        _e: new Types.ObjectId(p.email || p.e)
     }).save())._id;
 
     return _;

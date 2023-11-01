@@ -13,7 +13,7 @@ const { Schema, model } = require("mongoose");
  * @property {import("../data/d.cjs").Options<Schema.Types.Boolean, ActivitySchemaConfig>} result did the action fail or succed
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} action is it `create`, `read`, `update` or
  * `delete`, `grant`, `revoke`?
- * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} modelName the name of the table on which
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} modelName the name of the collection on which
  * this activity was performed.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} path the path to the property that was
  * mutated or read.

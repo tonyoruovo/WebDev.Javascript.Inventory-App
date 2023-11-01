@@ -1,4 +1,7 @@
 const { Schema, model } = require("mongoose");
+const { v } = require("../repo/utility.cjs");
+const { PaymentTerm } = require("./paymentTerm.cjs");
+const { Contact } = require("./contact.cjs");
 // const UnitSchema = new Schema({
 //     value: {
 //         type: Schema.Types.Number,
@@ -42,7 +45,15 @@ const location = {
     _c: {
         type: Schema.Types.ObjectId,
         ref: "Contact",
-        required: true
+        required: true,
+        validate: {
+            validator: async function(x) {
+                return v(await Contact.findById(x).exec());
+            },
+            message: function(x) {
+                return `${x} does not exists as an amount`;
+            }
+        }
     },
     _cp: {
         type: Schema.Types.Subdocument,
@@ -53,6 +64,14 @@ const location = {
         type: [{
             type: Schema.Types.ObjectId,
             ref: "PaymentTerm",
+            validate: {
+                validator: async function(x) {
+                    return v(await PaymentTerm.findById(x).exec());
+                },
+                message: function(x) {
+                    return `${x} does not exists as an amount`;
+                }
+            }
         }],
         alias: "paymentTerms"
     },

@@ -1,8 +1,10 @@
 
-const { Amount } = require("../models/amount.cjs");
 const { Product } = require("../models/product.cjs");
 const { Types } = require("mongoose");
-const { Subject } = require("../models/subject.cjs");
+const { v } = require("../repo/utility.cjs");
+// const { tmpdir } = require("os");
+// const { mkdtempSync, writeFileSync, readFileSync } = require("fs");
+// const { sep } = require("path");
 /**
  * A reference to a created {@linkcode Product} model.
  * @typedef {Object} ProductRef
@@ -13,21 +15,30 @@ const { Subject } = require("../models/subject.cjs");
 /**
  * @typedef {Object} ProductDoc
  * @property {string} name the name of this product. Must be unique.
- * @property {string} category the category of this product
- * @property {string} description the description of this product
+ * @property {string} [category] the category of this product
+ * @property {string[]} [categories] the categories of this product, this is a synonym of {@linkcode ProductDoc.category}.
+ * @property {string} c alias for {@linkcode ProductDoc.category}
+ * @property {string[]} cs alias for {@linkcode ProductDoc.categories}
+ * @property {string} [description] the description of this product
+ * @property {string} [descr] the description of this product. A synonym of {@linkcode ProductDoc.desc}
  * @property {string[]} logos the logos of this product
- * @property {Object} price the price data of this product
- * @property {number} price.amount the numerical price of this product
- * @property {string} price.iso the ISO code for the currency that the price of this product is quoted in
- * @property {string} price.comment the numerical price of this product
+ * @property {string} price an {@linkcode Types.ObjectId} object as a string which represent the proce of this product.
+ * @property {string} p alias for {@linkcode ProductDoc.price}
  * @property {string} manufacturer the name of the manufacturer of this product
- * @property {Date} manDate the date which this product was manufactured
- * @property {Date} expDate the date which this product will expire
+ * @property {string} m alias for {@linkcode ProductDoc.manufacturer}
+ * @property {string | number} manDate the date which this product was manufactured
+ * @property {string | number} md alias for {@linkcode ProductDoc.manDate}
+ * @property {string | number} expDate the date which this product will expire
+ * @property {string | number} ed alias for {@linkcode ProductDoc.expDate}
  * @property {number} quantity the quantity of this product
+ * @property {number} q alias for {@linkcode ProductDoc.quantity}
  * @property {number} rop the reorder point of this product i.e when quantity levels drop to this number and below, a restock
  * alert will be sent to product responsible for restocking.
- * @property {Buffer} barcode the id of this product. Must be unique.
+ * @property {number} r alias for {@linkcode ProductDoc.rop}
+ * @property {string} barcode the barcode of this product. Must be unique.
+ * @property {string} b alias for {@linkcode ProductDoc.barcode}
  * @property {string} supplier the id of the supplier of this product. Must already exist in the subject collection.
+ * @property {string} s alias for {@linkcode ProductDoc.supplier}
  */
 /**
  * Initial indexing for the product 
@@ -36,39 +47,35 @@ const { Subject } = require("../models/subject.cjs");
  */
 const add = async (p) => {
     if(Array.isArray(p)) return await bulkAdd(p);
+
+    // const tmp = tmpdir();
+
+    // const tempDir = mkdtempSync(`${tmp}${sep}`);
+
+    // writeFileSync(`${tempDir}barcode`, p.barcode || p.b, {encoding: "binary"});
+
+    // const code = readFileSync(`${tempDir}barcode`, {encoding: "binary"});
+    const code = Buffer.from(p.barcode, "binary");
+
     const _ = {};
-    _.price = (
-        await new Amount({
-            _cc: p.price.iso,
-            _ct: p.price.comment,
-            _id: new Types.ObjectId(),
-            _t: "add",
-            _v: p.price.amount
-        }).save()
-    )._id;
-    _.supplier = new Types.ObjectId(p.supplier);
+    _.supplier = new Types.ObjectId(p.supplier || p.s);
+    _.price = new Types.ObjectId(p.price || p.p);
+    _.product = (await new Product({
+        _id: new Types.ObjectId(),
+        _c: v(p.category || p.c) ? [(p.category || p.c), ...(p.categories || p.cs)] : (p.categories || p.cs),
+        _code: code,
+        _desc: p.descr || p.description,
+        _exp: new Date(p.expDate || p.exp),
+        _l: p.logos,
+        _m: p.m || p.manufacturer,
+        _man: p.manDate || p.md,
+        _n: p.name,
+        _pr: _.price,
+        _q: p.quantity || p.q,
+        _rop: p.rop || p.r,
+        _sp: _.supplier
+    }).save())._id;
 
-    if (!(await Subject.findById(_.supplier)._id)){
-        throw Error("Cannot save product because of invalid supplier id");
-    }
-
-    _.product = (
-        await new Product({
-            _c: p.category,
-            _code: p.barcode,
-            _desc: p.description,
-            _exp: p.expDate,
-            _id: new Types.ObjectId(),
-            _l: p.logos,
-            _m: p.manufacturer,
-            _man: p.manDate,
-            _n: p.name,
-            _pr: [_.price],
-            _q: p.quantity,
-            _rop: p.rop,
-            _sp: _.supplier
-        }).save()
-    )._id;
     return _;
 }
 /**

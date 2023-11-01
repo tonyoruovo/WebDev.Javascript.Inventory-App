@@ -1,5 +1,5 @@
 /**
- * Checks if the given value is `undefined` or `null` and returns `false` if it is otherwise returns `true`.
+ * Checks if the given value is `undefined` or `null` and returns `false` if it is, otherwise returns `true`.
  * @param {*} x the value to be checked
  * @returns {boolean} whether or not x is a valid value
  */

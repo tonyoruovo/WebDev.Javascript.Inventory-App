@@ -1,5 +1,8 @@
 
 const { Schema, model } = require("mongoose");
+const { v } = require("../repo/utility.cjs");
+const { Subject } = require("./subject.cjs");
+const { Product } = require("./product.cjs");
 
 /**
  * Combining the "Purchase Order Model" and the "Sales Order Model" into a single "Order Model" while merging the "status" property
@@ -94,7 +97,15 @@ const order = {
     _s: {
         type: Schema.Types.ObjectId,
         ref: "Subject",
-        alias: "subject"
+        alias: "subject",
+        validate: {
+            validator: async function(x) {
+                return v(await Subject.findById(x).exec());
+            },
+            message: function(x) {
+                return `${x} does not exists`;
+            }
+        }
     },
     _d: {
         type: Schema.Types.Date,
@@ -121,7 +132,15 @@ const order = {
         type: [{
             type: Schema.Types.ObjectId,
             ref: "Product",
-            required: true
+            required: true,
+            validate: {
+                validator: async function(x) {
+                    return v(await Product.findById(x).exec());
+                },
+                message: function(x) {
+                    return `${x} does not exists as a product`;
+                }
+            }
         }],
         alias: "items",
         required: true

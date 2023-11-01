@@ -48,7 +48,7 @@ const add = async p => {
  */
 const bulkAdd = async p => {
     const docs = [];
-    for(const s of p){
+    for (const s of p) {
         try {
             docs.push(await add(s));
         } catch (e) {

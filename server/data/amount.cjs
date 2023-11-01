@@ -16,7 +16,7 @@ const { Amount } = require("../models/amount.cjs");
  * The type of relation this will have to the total (base) amount. For example, if this value is `"add"`, then the {@linkcode AmountDoc.value}
  * property will be added to base amount.
  * @property {number} value the numerical representation of this amount.
- * @property {string} [expiresAt] for time-sensitive bills, promos and deductables. Specifies the time stamp for the expiration of
+ * @property {string | number} [expiresAt] for time-sensitive bills, promos and deductables. Specifies the time stamp for the expiration of
  * this amount. This is a {@linkcode Date} string value.
  * @property {string} [comments] any relevant info that should be included.
  * @property {string} [comment] an alias for {@linkcode AmountDoc.comments}.

@@ -1,5 +1,6 @@
 
 const { Schema, model } = require("mongoose");
+const { v } = require("../repo/utility.cjs");
 
 /**
  * @typedef {Object} ReportSchemaConfig
@@ -79,7 +80,7 @@ const report = {
             type: Schema.Types.Mixed,
             validate: {
                 validator: function(o) {
-                    return (typeof o.modelName) === "string" && o.modelName.length > 0 && Array.isArray(o.path) && o.path.every(y => y.indexOf('.') < 0);
+                    return v(o) && (typeof o.modelName) === "string" && o.modelName.length > 0 && Array.isArray(o.path) && o.path.every(y => y.indexOf('.') < 0);
                 },
                 message: function(){
                     return 'cannot have a "." in any path';

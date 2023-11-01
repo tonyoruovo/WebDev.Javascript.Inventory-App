@@ -5,7 +5,7 @@ const { v } = require("../repos/utility.cjs");
 
 /**
  * A class representing the full name of a person.
- * @typedef {Object} PersonName
+ * @typedef {Object} NameDoc
  * @property {string} name the person's first name
  * @property {string[]} others any other name that is not one of the others e.g nicknames
  * @property {string} surname the person's surname name
@@ -13,24 +13,26 @@ const { v } = require("../repos/utility.cjs");
  * @property {string[]} postTitles any title to be appended to the person's fullname e.g Ed, Phd etc
  */
 /**
- * Checks if the argument is in the acceptable format of a `PersonName`
- * @callback PersonNameChecker
+ * Checks if the argument is in the acceptable format of a `NameDoc`
+ * @callback NameChecker
  * @param {string} name the full name of the person to be validated.
- * @returns {boolean} `true` if the argument is valid or `false` if otherwise.
+ * @returns {Promise<boolean>} `true` if the argument is valid or `false` if otherwise.
  */
 /**
  * Validates the argument.
- * @type {PersonNameChecker}
+ * @type {NameChecker}
  */
-const check = function(x) {
+const check = async function(x) {
     const n = g(x);
-    return v(n) && v(n.name) && n.name.length >= 2 && v(n.surname) && n.surname.length >= 2;
+    // const exists = await Name.findById(name._id).exec();
+    return v(n.name) && n.name.length >= 2 && v(n.surname) && n.surname.length >= 2;
+    // return v(n.name) && n.name.length >= 2 && v(n.surname) && n.surname.length >= 2 && !exists;
 }
 /**
  * Gets a string message explaining why the check failed.
  * @callback CheckerErrMessage
  * @param {{value: string}} n The reference for proper construction of an error message.
- * @returns {string} the reason {@linkcode PersonNameChecker} return `false`.
+ * @returns {string} the reason {@linkcode NameChecker} return `false`.
  */
 /**
  * Error message.
@@ -49,26 +51,26 @@ const msg = function(x) {
 }
 /**
  * Sets a person's name to the argument by stringifying it into a given format.
- * @callback PersonNameSetter
- * @param {PersonName} name the name to be formatted.
+ * @callback NameSetter
+ * @param {NameDoc} name the name to be formatted.
  * @returns {string} the formatted value.
  */
 /**
  * Gets the name of a given person by parsing the stored string into an object.
- * @callback PersonNameGetter
+ * @callback NameGetter
  * @param {string} name the formatted string to be parsed
- * @returns {PersonName} the parsed value.
+ * @returns {NameDoc} the parsed value.
  */
 /**
  * Sets the value to a given person
- * @type {PersonNameSetter}
+ * @type {NameSetter}
  */
 const s = function (n) {
     return `${(n.preTitles??[]).join(String.fromCharCode(US))}${String.fromCharCode(GS)}${n.name}${String.fromCharCode(GS)}${n.surname}${String.fromCharCode(GS)}${(n.others??[]).join(String.fromCharCode(US))}${String.fromCharCode(GS)}${(n.postTitles??[]).join(String.fromCharCode(US))}`
 }
 /**
  * Gets the value for a given person
- * @type {PersonNameGetter}
+ * @type {NameGetter}
  */
 const g = function (n) {
     const v = n.split(String.fromCharCode(GS));
@@ -80,7 +82,7 @@ const g = function (n) {
     return { preTitles, name, surname, others, postTitles }
 }
 /**
- * A record of key values containing mongoose configurations for the `PersonNameSchema`.
+ * A record of key values containing mongoose configurations for the `NameSchema`.
  * @typedef {Object} NameSchemaConfig
  * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this person's name
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, NameSchemaConfig>} _n the actual name value
@@ -116,7 +118,7 @@ const name = {
  * ```
  * @type {mongoose.Schema<NameSchemaConfig>}
  */
-const PersonNameSchema = new mongoose.Schema(name, {
+const NameSchema = new mongoose.Schema(name, {
     timestamps: {
         createdAt: "_cAt",
         updatedAt: "_uAt"
@@ -130,6 +132,6 @@ const PersonNameSchema = new mongoose.Schema(name, {
  * The full name of a person.
  * @type {import("mongoose").Model<NameSchemaConfig>}
  */
-const PersonName = mongoose.model("PersonName", PersonNameSchema);
+const Name = mongoose.model("Name", NameSchema);
 
-module.exports = {PersonName, PersonNameSchema};
+module.exports = {Name, NameSchema};

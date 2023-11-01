@@ -1,27 +1,12 @@
 
 const { Types } = require("mongoose");
 const { PaymentTerm } = require("../models/paymentTerm.cjs");
-const { Amount } = require("../models/amount.cjs");
 
 /**
  * An object containing reference(s) to composite types stored against a paymentTerm in the {@linkcode PaymentTerm} collection.
  * @typedef {Object} PaymentTermRef
  * @property {Types.ObjectId} paymentTerm a reference to the paymentTerm itself within the {@linkcode PaymentTerm} collection.
  * @property {Types.ObjectId[]} amounts the reference to the amounts. 
- */
-/**
- * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total amount.
- * @typedef {Object} AmountDoc
- * @property {string} [iso="566"] the 3-letter ISO code for the currency being used for this transaction. The default is the code
- * `"566"` which is the currency code for the Nigerian Naira.
- * @property {"a" | "add" | "subtract" | "s" | "multiply" | "m" | "divide" | "d" | "sqrt" | "cbrt" | "exp" | "percent" | "log"} [type="add"]
- * The type of relation this will have to the total (base) amount. For example, if this value is `"add"`, then the {@linkcode AmountDoc.value}
- * property will be added to base amount.
- * @property {number} value the numerical representation of this amount.
- * @property {string} [expiresAt] for time-sensitive bills, promos and deductables. Specifies the time stamp for the expiration of
- * this amount. This is a {@linkcode Date} string value.
- * @property {string} [comments] any relevant info that should be included.
- * @property {string} [comment] an alias for {@linkcode AmountDoc.comments}.
  */
 /**
  * An Object whose properties map to the {@linkcode PaymentTerm} model, as such, is used to instantiate the model, which is added
@@ -33,7 +18,7 @@ const { Amount } = require("../models/amount.cjs");
  * payment plan and `interval` is set.
  * @property {"second" | "minute" | "hour" | "day" | "week" | "month" | "year" | "decade"} [interval="day"] the unit of time being used for partial
  * payments.
- * @property {AmountDoc[]} amounts all deductions, reductions, prices, taxes, bills, charges, promos etc.
+ * @property {string[]} amounts an array of {@linkcode Types.ObjectId} objects as strings representing all deductions, reductions, prices, taxes, bills, charges, promos etc.
  * @property {"cheque" | "check" | "cash" | "wire" | "credit" | "etf"} paymentType the payment method. the `"etf"` option stands for
  * *E*lectronic *T*ransfer *F*unds these include (paypal, verve, interswitch, crypto etc).
  * @property {string[]} codes important codes and numbers related to this payment term, for example account numbers, transfer
@@ -49,14 +34,7 @@ const add = async p => {
 
     const _ = {};
 
-    _.amounts = p.amounts.map(x => new Amount({
-        _cc: x.iso,
-        _ct: x.comment || x.comments,
-        _expiresAt: new Date(x.expiresAt),
-        _id: new Types.ObjectId(),
-        _t: x.type,
-        _v: x.value
-    }));
+    _.amounts = p.amounts.map(x => new Types.ObjectId(x));
 
     _.paymentTerm = ((await new PaymentTerm({
         _id: new Types.ObjectId(),
