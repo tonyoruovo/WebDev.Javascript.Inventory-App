@@ -6,10 +6,10 @@ const { v } = require("../repo/utility.cjs");
 /**
  * @typedef {Object} EmployeeSchemaConfig
  * @property {Schema.Types.ObjectId} _id the mongoose id of this employee.
- * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, EmployeeSchemaConfig>} _s the subject of this employee. The `alias` is
- * `subject` and reference is `Subject`.
- * @property {import("../data/d.cjs").Options<Schema.Types.Buffer, EmployeeSchemaConfig>} _sig the signature of this employee. The `alias` is
- * `signature`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, EmployeeSchemaConfig>} _s the subject of this employee. The
+ * `alias` is `subject` and reference is `Subject`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.Buffer, EmployeeSchemaConfig>} _sig the signature of this employee. The
+ * `alias` is `signature`.
  * @todo will add this property {import("../data/d.cjs").Options<[RoleSchema], EmployeeSchemaConfig>} _r array of roles for this employee. the `alias`
  * is `roles`.
  */

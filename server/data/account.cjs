@@ -1,19 +1,25 @@
 const { Types } = require("mongoose");
 const { Account } = require("../models/account.cjs");
-const jwt = require("jsonwebtoken");
+const { v } = require("../repo/utility.cjs");
+const { encrypt, generateToken, decrypt } = require("../repo/crypto.cjs");
 /**
+ * An object representing the reference to a successful login and/or signup.
  * @typedef {Object} AccountRef
- * @property {Types.ObjectId} account
+ * @property {Types.ObjectId} account the id property of the `Account` model that represents this account.
  * @property {Types.ObjectId} email
+ * @property {string} tkn the jwt token that was attached to the reference. This can be used to access protected resources.
  */
 /**
  * An object whose properties map to the {@linkcode Account} model, as such, is used to instantiate the model, which is stored in
  * an `Account` collection afterwards.
  * @typedef {Object} AccountDoc
  * @property {string} username the username of this account. The range is [3, 24].
+ * @property {string} u alias for {@linkcode AccountDoc.username}
  * @property {string} e an alias for {@linkcode AccountDoc.email}.
  * @property {string} email {@linkcode Types.ObjectId} as a string representing the email of this account.
  * @property {string} [unhashed] the unhashed password of this account. For internal accounts, this is required.
+ * @property {string} [password] alias for {@linkcode AccountDoc.unhashed}. Represents the password of this account
+ * @property {string} [pw] alias for {@linkcode AccountDoc.password}
  * @property {string} [p] the external provider such as facebook, google, twitter. For external accounts, this is required.
  * @property {string} [pid] the external provider. For external accounts, this is required.
  * @property {string} [at] the provider access token. For external accounts, this is required.
@@ -36,15 +42,21 @@ const add = async p => {
 		await new Account({
 			_at: p.at,
 			_ats: p.ats,
-			_h: p.unhashed,
+			_h: encrypt(
+				p.pw || p.password || p.unhashed,
+				"../repo/private_key"
+			).toString("base64"),
+			// _id: new Types.ObjectId(Buffer.from(p.u || p.username, "utf8").toString("hex")),
 			_id: new Types.ObjectId(),
 			_p: p.p,
 			_pid: p.pid,
 			_rt: p.rt,
-			_u: p.username,
+			_u: p.u || p.username,
 			_e: _.email
 		}).save()
 	)._id;
+
+	_.tkn = generateToken(_.account, require("../../package.json").jwt);
 
 	return _;
 };
@@ -132,20 +144,38 @@ const mod = async p => {
 };
 
 /**
- * Generates a jwt and returns it as a jwt authorization header compatible `string`
- * @param {string} id the id of the user to which this token is assigned
- * @param {string} token the JSON Web token key with which a token will be generated
- * @returns { string } a string representing the jwt
+ * Validates the argument and instantiates the `tkn` property as well as the id.
+ * @param {AccountDoc} p the parameter object with the username and password.
+ * @returns {Promise<AccountRef>} the reference of the login. Note that the `email` property will be `undefined`.
  */
-function generateToken(id, token) {
-  return jwt.sign({ id }, token, {
-    expiresIn: 15 * 60,
-  });
-}
+const login = async p => {
+	let u = p.u || p.username;
+	const pw = p.pw || p.password || p.unhashed;
+	if (!v(u)) throw Error("username is missing");
+	else if (!v(pw)) throw Error("password missing");
+
+	const ac = await Account.findOne({ _u: u }).select("_u _h _id").exec();
+	if (!v(ac) || !v(ac._u)) throw Error("username does not exist");
+	if (
+		!(
+			pw !==
+			decrypt(Buffer.from(ac._h, "base64"), "../repo/private_key").toString(
+				"utf8"
+			)
+		)
+	)
+		throw Error("password mismatch");
+
+	return {
+		account: ac._id,
+		tkn: generateToken(ac._id, require("../../package.json"))
+	};
+};
 
 module.exports = {
 	add,
 	mod,
 	rem,
-	ret
+	ret,
+	login
 };
