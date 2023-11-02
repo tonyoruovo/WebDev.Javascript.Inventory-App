@@ -51,7 +51,7 @@ const { v } = require("../repo/utility.cjs");
  * payment period interval. The alias is `tAndC`. This includes when the payment method is specified as `others`, as it is expected
  * that the details are given here.
  * @property {import("../data/d.cjs").Options<[Schema.Types.ObjectId], PaymentTermSchemaConfig>} _a amounts. This includes base cost/bill
- * and any additional fees, taxes, charges and/or discounts. The alias is `amounts`.
+ * and any additional fees, taxes, charges and/or discounts. The alias is `amounts`. This is for suppliers and not for casual customers.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, PaymentTermSchemaConfig>} _ty the payment type. The alias is
  * `paymentType`. Includes `cheque`, `check`, `cash`, `wire`, `credit`, `etf` (`paypal`, `verve`, `interswitch`, `crypto` etc).
  * @property {import("../data/d.cjs").Options<[Schema.Types.String], PaymentTermSchemaConfig>} _ic important codes and numbers related

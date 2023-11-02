@@ -36,7 +36,7 @@ const add = async p => {
         _cc: p.iso,
         _ct: p.comment || p.comments,
         _expiresAt: new Date(p.expiresAt),
-        _t: p.type,
+        _t: p.type || "add",
         _v: p.value
     }).save())._id);
 

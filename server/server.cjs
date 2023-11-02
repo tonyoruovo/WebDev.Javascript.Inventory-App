@@ -73,7 +73,7 @@ module.exports = () => {
     app.use(morgan("combined", {
         stream: createWriteStream(join(__dirname, 'access.log'), { flags: 'a' })
     }));
-    app.use("/api/v1/account", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/account.cjs"));
+    app.use("/api/v1/account", require("./routes/account.cjs"));
     app.use("/api/v1/address", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/address.cjs"));
     app.use("/api/v1/alert", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/alert.cjs"));
     app.use("/api/v1/amount", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/amount.cjs"));

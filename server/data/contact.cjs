@@ -6,9 +6,9 @@ const { v } = require("../repo/utility.cjs");
  * An object containing reference(s) to composite types stored against an contact in the {@linkcode Contact} collection.
  * @typedef {Object} ContactRef
  * @property {Types.ObjectId} contact a reference to the contact itself within the {@linkcode Contact} collection.
- * @property {Types.ObjectId[]} addresses a reference to addresses within the {@linkcode Address} collection.
- * @property {Types.ObjectId[]} phones a reference to phones within the {@linkcode Phone} collection.
- * @property {Types.ObjectId} account a reference to the account within the {@linkcode Phone} collection.
+ * @property {Types.ObjectId[]} addresses references to addresses within the `Address` collection.
+ * @property {Types.ObjectId[]} phones references to phones within the `Phone` collection.
+ * @property {Types.ObjectId} account a reference to the account within the `Account` collection.
  */
 /**
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total contact.

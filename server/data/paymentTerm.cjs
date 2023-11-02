@@ -5,7 +5,7 @@ const { PaymentTerm } = require("../models/paymentTerm.cjs");
 /**
  * An object containing reference(s) to composite types stored against a paymentTerm in the {@linkcode PaymentTerm} collection.
  * @typedef {Object} PaymentTermRef
- * @property {Types.ObjectId} paymentTerm a reference to the paymentTerm itself within the {@linkcode PaymentTerm} collection.
+ * @property {Types.ObjectId} paymentTerm a reference to the paymentTerm itself within the `PaymentTerm` collection.
  * @property {Types.ObjectId[]} amounts the reference to the amounts. 
  */
 /**

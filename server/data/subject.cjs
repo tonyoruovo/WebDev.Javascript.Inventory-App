@@ -4,9 +4,9 @@ const { Subject } = require("../models/subject.cjs");
 /**
  * An object containing reference to composite types stored against a subject in the {@linkcode Subject} collection.
  * @typedef {Object} SubjectRef
- * @property {Types.ObjectId} contact a reference to the contact in the {@linkcode Contact} collection.
- * @property {Types.ObjectId} subject a reference to the subject in the `Subject` collection.
- * @property {Types.ObjectId[]} paymentTerms an array of references to the paymentTerm in the {@linkcode PaymentTerm} collection.
+ * @property {Types.ObjectId} subject a reference to the subject in the {@linkcode Subject} collection.
+ * @property {Types.ObjectId} contact a reference to the contact in the `Contact` collection.
+ * @property {Types.ObjectId[]} paymentTerms an array of references to the paymentTerm in the `PaymentTerm` collection.
  */
 /**
  * An object whose properties map to the {@linkcode Subject} model, as such, is used to instantiate the model, which is stored in

@@ -388,14 +388,15 @@ const listCommands = async function(p) {
 /*******MISCELLANOUS*******/
 
 /**
+ * Parameter object for issuing commands to the database.
  * @typedef {Object} CmdParam
- * @property {Record<string, any>} cmd
- * @property {Object} connStr
- * @property {string} connStr.uri
- * @property {Object} connStr.options
- * @property {string} connStr.options.dbName
- * @property {Object} connStr.options.serverApi
- * @property {string} connStr.options.serverApi.version
+ * @property {Record<string, any>} cmd the command to issued
+ * @property {Object} connStr Contains the neccessary values for connecting to a database.
+ * @property {string} connStr.uri the URI i.e the connection string
+ * @property {Object} connStr.options any extra options used during the connection
+ * @property {string} connStr.options.dbName the database name
+ * @property {Object} connStr.options.serverApi the server api object
+ * @property {string} connStr.options.serverApi.version the version of the server api
  */
 /**
  * Runs a low-level command. Please see the [database command list](https://www.mongodb.com/docs/v7.0/reference/command/)
