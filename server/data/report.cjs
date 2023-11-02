@@ -12,7 +12,7 @@ const { Report } = require("../models/report.cjs");
  * @typedef {Object} ReportParam The location of the subject of this report as well as any relevant parameters.
  * here are essential.
  * @property {string} modelName The name of the model directly related to this report.
- * @property {string[]} path path to any specific property within the model. Each element represents a nesting level in the path
+ * @property {string[]} path path to any specific property within the related model. Each element represents a nesting level in the path
  * therefore, the dot `'.'` character is not allowed within each string
  */
 /**
