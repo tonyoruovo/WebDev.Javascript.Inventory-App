@@ -3,8 +3,7 @@ const mongoose = require("mongoose");
 
 /**
  * @typedef {Object} PhoneSchemaConfig
- * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this phone number
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, PhoneSchemaConfig>} _n the actual phone value.
+ * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this phone number which is also the atual phone number value.
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, PhoneSchemaConfig>} _c the country code. The ISO
  * country code of the given phone number
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.Number, PhoneSchemaConfig>} _pf the preference of this number.
@@ -38,15 +37,6 @@ const mongoose = require("mongoose");
  */
 const phone = {
     _id: mongoose.Schema.Types.ObjectId,
-    _n: {
-        type: mongoose.Schema.Types.String,
-        unique: true,
-        required: true,
-        alias:"number",
-        minlength: 11,
-        maxlength: 11,
-        match: /^\d\d{9}\d$/g
-    },
     _t: {
         type: mongoose.Schema.Types.String,
         alias:"numberType",

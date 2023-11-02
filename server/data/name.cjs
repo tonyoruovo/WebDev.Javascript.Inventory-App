@@ -1,4 +1,3 @@
-const { Types } = require("mongoose");
 const { Name } = require("../models/name.cjs");
 
 /**
@@ -22,8 +21,7 @@ const add = async p => {
 
 	_.name = (
 		await new Name({
-			_id: new Types.ObjectId(),
-            _n: p
+			_id: p
 		}).save()
 	)._id;
 
@@ -53,7 +51,7 @@ const bulkAdd = async p => {
  */
 const ret = async p => {
 	if (Array.isArray(p)) return await bulkRet(p);
-	return await Name.findOne(p).select("-_id -_cAt -_uAt -_vk").exec();
+	return await Name.findOne(p).select("-_cAt -_uAt -_vk").exec();
 };
 /**
  * Retrieves the details of the given name using the array of queries to execute for each of the item to get.

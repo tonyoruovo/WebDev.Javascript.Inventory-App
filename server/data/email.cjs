@@ -24,8 +24,7 @@ const add = async p => {
 
 	_.email = (
 		await new Email({
-			_id: new Types.ObjectId(),
-            _e: p.e || p.email
+			_id: new Types.ObjectId(Buffer.from(p.e||p.email, "utf8"))
 		}).save()
 	)._id;
 
@@ -55,7 +54,7 @@ const bulkAdd = async p => {
  */
 const ret = async p => {
 	if (Array.isArray(p)) return await bulkRet(p);
-	return await Email.findOne(p).select("-_id -_cAt -_uAt -_vk").exec();
+	return await Email.findOne(p).select("-_cAt -_uAt -_vk").exec();
 };
 /**
  * Retrieves the details of the given email using the array of queries to execute for each of the item to get.

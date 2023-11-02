@@ -25,7 +25,7 @@ const auth = asyncHandler(
 			try {
 				let t = req.headers.authorization.split(" ")[1];
 				const verified = jwt.verify(t, require("../../package.json").jwt);
-				req.user = await Account.findById(verified.id).select("_u _id -_h");
+				req.user = await Account.findById(verified.id).select("_id -_h");
 				if (!v(req.user) || !v(req.user._u)) nAuth(Error("Not Authourized"));
 				//   const c = await Contact.findOne({
 				//     _ac: req.user._id

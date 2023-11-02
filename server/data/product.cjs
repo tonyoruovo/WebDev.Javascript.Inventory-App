@@ -61,9 +61,8 @@ const add = async (p) => {
     _.supplier = new Types.ObjectId(p.supplier || p.s);
     _.price = new Types.ObjectId(p.price || p.p);
     _.product = (await new Product({
-        _id: new Types.ObjectId(),
+        _id: code,
         _c: v(p.category || p.c) ? [(p.category || p.c), ...(p.categories || p.cs)] : (p.categories || p.cs),
-        _code: code,
         _desc: p.descr || p.description,
         _exp: new Date(p.expDate || p.exp),
         _l: p.logos,

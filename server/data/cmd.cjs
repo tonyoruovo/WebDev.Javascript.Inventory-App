@@ -172,12 +172,7 @@ const create = async function(cur){
  */
 const shutdown = async function(p){
     try {
-        let x = await mongoose.connection.db.command({
-            shutdown: p.shutdown,
-            force: p.force,
-            timeoutSecs: p.timeoutSecs,
-            comment: p.comment
-        });
+        let x = await mongoose.connection.db.command(p);
         setImmediate(() => {
             log("Shutdown sucessful");
         });

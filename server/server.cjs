@@ -17,6 +17,30 @@ const {join} = require("path");
  * @property {() => boolean} ic checks if this has a valid connection to a database instance.
  * @property {() => Promise<void>} end checks if this has a valid session.
  */
+/**
+ * @typedef {Object} OperationModel
+ * @property {string}
+ */
+/**
+ * An object for tracking models during a complex insert operation. For example: to insert data into the `Employee` model, one has
+ * to have an id for the `Subject` model, to have an id for a subject, one has to have an id for the `Contact` model, to have an id
+ * for the contact, one has to have an id for the following:
+ * - a `Name` model
+ * - an `Account` model
+ * - an `Address` model
+ * - a `Phone` model
+ * 
+ * `Account` and `Address` models have also complex data structure that require ids and so on. To mitigate accidentally inserting
+ * 'incomplete' data for any model, an `Operation` object is required by the server, which will verify the type of operation that
+ * will be performed. An `Operation` can be ended, or aborted. All operations are time-sensitive and will auto-abort after an
+ * elapsed time.
+ * @typedef {Object} Operation
+ * @property {number} time the start time of this operation
+ * @property {() => Promise<void>} save saves the all models associated with this `Operation`. If there is an any of the models cannot
+ * be saved (maybe due to an imcompatible property) all models will not be saved. This prevents a suituation whereby there is 'dangling'
+ * data on the db. E.g an `Email` model without an `Account` model that directly owns it.
+ * @property
+ */
 
 module.exports = () => {
     
@@ -49,7 +73,6 @@ module.exports = () => {
     app.use(morgan("combined", {
         stream: createWriteStream(join(__dirname, 'access.log'), { flags: 'a' })
     }));
-    // app.use("/api/v1/account", require("./routes/account.cjs"));
     app.use("/api/v1/account", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/account.cjs"));
     app.use("/api/v1/address", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/address.cjs"));
     app.use("/api/v1/alert", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/alert.cjs"));

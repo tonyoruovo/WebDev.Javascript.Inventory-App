@@ -7,7 +7,8 @@ const { Amount } = require("./amount.cjs");
  * Product models are meant to be immutable, hence whenever a price is changed, the old `Product` model
  * should be replaced with the new one as opposed to mutating an existing one and saving it.
  * @typedef {Object} ProductSchemaConfig
- * @property {Schema.Types.ObjectId} _id the mongoose id of this product
+ * @property {import("../data/d.cjs").Options<Schema.Types.Buffer, ProductSchemaConfig>} _id the mongoose id of this product, which
+ * is also the bar code, qr code or any other unique identifier on the product/service. The alias is `code`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ProductSchemaConfig>} _n the name of this product. The alias is `name`.
  * @property {import("../data/d.cjs").Options<[Schema.Types.String], ProductSchemaConfig>} _c the categories of this product. The `alias` is `categories`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ProductSchemaConfig>} _desc the description of this product. The `alias` is `description`.
@@ -23,24 +24,22 @@ const { Amount } = require("./amount.cjs");
  * alias is `supplier` and ref is `Supplier`.
  * @property {import("../data/d.cjs").Options<Schema.Types.Number, ProductSchemaConfig>} _q the quantity in stock. The alias is `quantityInStock`.
  * @property {import("../data/d.cjs").Options<Schema.Types.Number, ProductSchemaConfig>} _rop the reorder point. The alias is `reorderPoint`.
- * @property {import("../data/d.cjs").Options<Schema.Types.Buffer, ProductSchemaConfig>} _code the bar code, qr code or any other
- * unique identifier on the product/service. The alias is `code`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.Buffer, ProductSchemaConfig>} _code 
  */
 /**
  * @type {ProductSchemaConfig}
  */
 const product = {
-	_id: Schema.Types.ObjectId,
+	_id: {
+		type: Schema.Types.Buffer,
+		alias: "code",
+		required: true
+	},
 	_c: {
 		type: [Schema.Types.String],
 		alias: "categories",
 		minlength: 1
 		// index: true
-	},
-	_code: {
-		type: Schema.Types.Buffer,
-		alias: "code",
-		required: true
 	},
 	_desc: {
 		type: Schema.Types.String,

@@ -80,7 +80,7 @@ const decrypt = function(encryptedText, privateKeyFile) {
 
 /**
  * Generates a jwt and returns it as a jwt authorization header compatible `string`
- * @param {string} id the id of the user to which this token is assigned
+ * @param {string | import("mongoose").Types.ObjectId | Uint8Array | number | bigint} id the id of the user to which this token is assigned
  * @param {string} token the JSON Web token key with which a token will be generated
  * @returns { string } a string representing the jwt
  */

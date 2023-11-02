@@ -1,5 +1,6 @@
 const { Types } = require("mongoose");
 const { Phone } = require("../models/phone.cjs");
+const { v } = require("../repo/utility.cjs");
 
 /**
  * An object containing reference(s) to composite types stored against an phone in the {@linkcode Phone} collection.
@@ -24,13 +25,16 @@ const { Phone } = require("../models/phone.cjs");
 const add = async p => {
 	if (Array.isArray(p)) return await bulkAdd(p);
 
+	const n = p.n || p.number;
+	if(!v(n)) Error("no number specified");
+	else if(!/^\d\d{9}\d$/g.test(n)) Error("not a phone number");
+
 	const _ = {};
 
 	_.phone = (
 		await new Phone({
-			_id: new Types.ObjectId(),
+			_id: new Types.ObjectId(Buffer.from(n)),
             _c: p.iso || "234",
-            _n: p.n || p.number,
             _pf: p.pref,
             _t: p.type
 		}).save()

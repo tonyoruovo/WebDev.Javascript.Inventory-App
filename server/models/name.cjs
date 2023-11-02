@@ -84,15 +84,13 @@ const g = function (n) {
 /**
  * A record of key values containing mongoose configurations for the `NameSchema`.
  * @typedef {Object} NameSchemaConfig
- * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this person's name
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, NameSchemaConfig>} _n the actual name value
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, NameSchemaConfig>} _id the mongoose id of this person's name and the actual name value
  */
 /**
  * @type {NameSchemaConfig}
  */
 const name = {
-    _id: mongoose.Schema.Types.ObjectId,
-    _n: {
+    _id: {
         type: mongoose.Schema.Types.String,
         validate: {
             validator: check,

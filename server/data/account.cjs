@@ -46,12 +46,12 @@ const add = async p => {
 				p.pw || p.password || p.unhashed,
 				"../repo/private_key"
 			).toString("base64"),
-			// _id: new Types.ObjectId(Buffer.from(p.u || p.username, "utf8").toString("hex")),
-			_id: new Types.ObjectId(),
+			_id: new Types.ObjectId(Buffer.from(p.u || p.username, "utf8")),
+			// _id: new Types.ObjectId(),
 			_p: p.p,
 			_pid: p.pid,
 			_rt: p.rt,
-			_u: p.u || p.username,
+			// _u: p.u || p.username,
 			_e: _.email
 		}).save()
 	)._id;
@@ -84,7 +84,7 @@ const bulkAdd = async p => {
  */
 const ret = async p => {
 	if (Array.isArray(p)) return await bulkRet(p);
-	return await Account.findOne(p).select("-_id -_cAt -_uAt -_vk").exec();
+	return await Account.findOne(p).select("_id -_cAt -_uAt -_vk").exec();
 };
 /**
  * Retrieves the details of the given account using the array of queries to execute for each of the item to get.
@@ -154,7 +154,7 @@ const login = async p => {
 	if (!v(u)) throw Error("username is missing");
 	else if (!v(pw)) throw Error("password missing");
 
-	const ac = await Account.findOne({ _u: u }).select("_u _h _id").exec();
+	const ac = await Account.findOne({ _id: new Types.ObjectId(Buffer.from(u, "utf8")) }).select("_h _id").exec();
 	if (!v(ac) || !v(ac._u)) throw Error("username does not exist");
 	if (
 		!(

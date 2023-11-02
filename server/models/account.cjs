@@ -5,9 +5,8 @@ const { Email } = require("./email.cjs");
 
 /**
  * @typedef {Object} AccountSchemaConfig
- * @property {Schema.Types.ObjectId} _id the mongoose id of this account
+ * @property {Schema.Types.ObjectId} _id the mongoose id of this account. This is instantiated from the username.
  * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, AccountSchemaConfig>} _e the email.
- * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _u the username. The range is [3, 24].
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _h the hashed pass.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _s the status.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _p the provider (for external accounts such as facebook, google, twitter).
@@ -15,6 +14,7 @@ const { Email } = require("./email.cjs");
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _at the provider access token.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _rt the provider refresh token (for oauth).
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _ats the provider access token secret (for twitter).
+ * @todo removed property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _u the username. The range is [3, 24].
  */
 /**
  * @type {AccountSchemaConfig}

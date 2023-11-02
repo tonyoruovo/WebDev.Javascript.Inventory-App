@@ -4,8 +4,7 @@ const mongoose = require("mongoose");
 /**
  * A record of key values containing mongoose configurations for the `EmailSchema`.
  * @typedef {Object} EmailSchemaConfig
- * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this email
- * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, EmailSchemaConfig>} _e the actual email value.
+ * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this email which is the actual email value.
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.Boolean, EmailSchemaConfig>} _v
  * If `true`, then this email has been verified.
  */
@@ -14,15 +13,6 @@ const mongoose = require("mongoose");
  */
 const email = {
     _id: mongoose.Schema.Types.ObjectId,
-    _e: {
-        type: mongoose.Schema.Types.String,
-        trim: true,
-        match: /.+@.+/g,
-        minlength: 3,
-        unique: true,
-        required: true,
-        alias: "email"
-    },
     _v: {
         type: mongoose.Schema.Types.Boolean,
         default: false
