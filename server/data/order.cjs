@@ -12,7 +12,7 @@ const { Order } = require("../models/order.cjs");
  * an `Order` collection afterwards.
  * @typedef {Object} OrderDoc
  * @property {string} comments any relevant comments for this order.
- * @property {string} dd a valid {@linkcode Date} string representing the delivery date.
+ * @property {string | number} dd a valid {@linkcode Date} string (or timestamp) representing the delivery date/time.
  * @property {string[]} items product ids as strings, representing the products that is being ordered.
  * @property {"adjustment" | "assembly" | "count" | "cycle-count" | "consumption" | "kitting" | "purchase" | "replenishment" | "reserve" | "return" | "sale" | "transfer"} type the type of order.
  * @property {string} subject the id of the subject initiating this order.

@@ -11,9 +11,9 @@ const { Transaction } = require("../models/transaction.cjs");
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total transaction.
  * @typedef {Object} TransactionDoc
  * @property {string} msg any related comments, complaints, review, message etc for this transaction
- * @property {string} e The id of the employee that approved (is responsible for) this transaction
- * @property {string} l The id of the location from which this product will be shipped.
- * @property {string} oid The id of the order to which this transaction is responding to.
+ * @property {string} e {@linkcode Types.ObjectId} as a string representing the employee that approved (is responsible for) this transaction
+ * @property {string} l {@linkcode Types.ObjectId} as a string representing the location from which this product will be shipped.
+ * @property {string} oid {@linkcode Types.ObjectId} as a string representing the order to which this transaction is responding to.
  * @property {string[]} amounts {@linkcode Types.ObjectId} as a string representing additional transaction-wide deductions, promos.
  */
 /**
