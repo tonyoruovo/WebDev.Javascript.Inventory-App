@@ -1,5 +1,5 @@
 const { get, remove, post, update } = require("../controllers/amount.cjs");
-const { auth } = require("../data/cmd.cjs");
+const auth  = require("../controllers/middlewares/auth.cjs");
 /**
  * Multiple routes that are logically related to amount data
  */

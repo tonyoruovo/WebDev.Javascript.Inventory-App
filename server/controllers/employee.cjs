@@ -1,4 +1,3 @@
-const { readFileSync } = require("fs");
 
 const { Types } = require("mongoose"),
 	asyncHandler = require("express-async-handler"),
@@ -108,8 +107,8 @@ const { Types } = require("mongoose"),
 	 */
 	post = asyncHandler(async function (rq, rs) {
 		try {
-			rq.body.dob = new Date(Date.parse(rq.body.dob));
-			rq.body.sig = readFileSync(rq.body.sig, "binary");
+			// rq.body.dob = new Date(Date.parse(rq.body.dob));
+			// rq.body.sig = readFileSync(rq.body.sig, "binary");
 
 			const e = await set(rq.body);
 			// delete rq.body.dbsession;

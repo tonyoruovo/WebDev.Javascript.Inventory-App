@@ -2,17 +2,17 @@ const { Schema, model } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
 const { PaymentTerm } = require("./paymentTerm.cjs");
 const { Contact } = require("./contact.cjs");
-// const UnitSchema = new Schema({
-//     value: {
-//         type: Schema.Types.Number,
-//         min: 0,
-//         required: true
-//     },
-//     unit: {
-//         type: Schema.Types.String,
-//         required: true
-//     }
-// });
+const UnitSchema = new Schema({
+    value: {
+        type: Schema.Types.Number,
+        min: 0,
+        required: true
+    },
+    unit: {
+        type: Schema.Types.String,
+        required: true
+    }
+});
 /**
  * A contextual definition of a number.
  * @typedef {Object} Unit
@@ -56,7 +56,7 @@ const location = {
         }
     },
     _cp: {
-        type: Schema.Types.Subdocument,
+        type: UnitSchema,
         alias: "capacity",
         required: true
     },
@@ -114,7 +114,7 @@ const LocationSchema = new Schema(location, {
     },
     versionKey: "_vk"
 });
-
+// LocationSchema.plugin(() => )
 /**
  * The model for the location
  * @type {import("mongoose").Model<LocationSchemaConfig>}

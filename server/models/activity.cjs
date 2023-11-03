@@ -8,21 +8,21 @@ const { Schema, model } = require("mongoose");
 /**
  * @typedef {Object} ActivitySchemaConfig
  * @property {Schema.Types.ObjectId} _id The mongoose id for this activity.
- * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, ActivitySchemaConfig>} subject the initiator
- * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, ActivitySchemaConfig>} object the receptor
- * @property {import("../data/d.cjs").Options<Schema.Types.Boolean, ActivitySchemaConfig>} result did the action fail or succed
- * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} action is it `create`, `read`, `update` or
- * `delete`, `grant`, `revoke`?
- * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} modelName the name of the collection on which
- * this activity was performed.
- * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} path the path to the property that was
- * mutated or read.
- * @property {import("../data/d.cjs").Options<Schema.Types.Date, ActivitySchemaConfig>} recievedAt the time stamp for when this
- * activity was recieved by the system.
- * @property {import("../data/d.cjs").Options<Schema.Types.Date, ActivitySchemaConfig>} resultAt the time stamp for when this activity
- * was responded to by the system.
- * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} statusCode for http requests. The status
- * code that this activity generated after being responded to.
+ * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, ActivitySchemaConfig>} s the initiator. The alias is `subject`. Although no ref is given, this is probably a reference to a document in the `Subject` or `Employee` collection.
+ * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, ActivitySchemaConfig>} o the receptor. The alias is `object`. Although no ref is given, this is probably a reference to a document in the `Subject` or `Employee` collection.
+ * @property {import("../data/d.cjs").Options<Schema.Types.Boolean, ActivitySchemaConfig>} r did the action fail or succeed. The alias is `result`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} a is it `create`, `read`, `update` or
+ * `delete`, `grant`, `revoke`? The alias is `action`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} mn the name of the collection on which
+ * this activity was performed. The alias is `modelName`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} p the path to the property that was
+ * mutated or read. The alias is `path`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.Date, ActivitySchemaConfig>} rt the time stamp for when this
+ * activity was recieved by the system. The alias is `receivedAt`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.Date, ActivitySchemaConfig>} rst the time stamp for when this activity
+ * was responded to by the system. The alias is `resultAt`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} sc for http requests. The status
+ * code that this activity generated after being responded to. The alias is `statusCode`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ActivitySchemaConfig>} msg log messages from this activity.
  */
 /**
@@ -30,36 +30,42 @@ const { Schema, model } = require("mongoose");
  */
 const activity = {
     _id: Schema.ObjectId,
-    action: {
+    a: {
         type: Schema.Types.String,
-        enum: ["create", "read", "update", "delete"],
-        required: true
+        enum: ["create", "read", "update", "delete", "grant", "revoke"],
+        required: true,
+        alias: "action"
     },
-    modelName: {
+    mn: {
         type: Schema.Types.String,
-        required: true
+        required: true,
+        alias: "modelName"
     },
     msg: Schema.Types.String,
-    object: {
+    o: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        alias: "object"
     },
-    path: {
+    p: {
         type: Schema.Types.String,
         required: true,
         minlength: 1,
-        trim: true
+        trim: true,
+        alias: "path"
     },
-    recievedAt: {
+    rt: {
         type: Schema.Types.Date,
         required: true,
-        max: new Date()
+        max: new Date(),
+        alias: "receivedAt"
     },
-    result: {
+    r: {
         type: Schema.Types.Boolean,
-        required: true
+        required: true,
+        alias: "result"
     },
-    resultAt: {
+    rst: {
         type: Schema.Types.Date,
         required: true,
         validate: {
@@ -76,17 +82,20 @@ const activity = {
                 x.getUTCDate() >= d.getUTCDate() && x.getUTCHours() >= d.getUTCHours() && x.getUTCMinutes() >= d.getUTCMinutes() &&
                 x.getUTCSeconds() >= d.getUTCSeconds() && x.getUTCMilliseconds() >= d.getUTCMilliseconds();
             }
-        }
+        },
+        alias: "resultAt"
     },
-    statusCode: {
+    sc: {
         type: Schema.Types.String,
         minlength: 3,
         maxlength: 3,
-        match: /\d{3}/g
+        match: /\d{3}/g,
+        alias: "statusCode"
     },
-    subject: {
+    s: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        alias: "subject"
     }
 }
 
@@ -101,6 +110,7 @@ const activity = {
  *     versionKey: "_vk"
  * }
  * ```
+ * @type {Schema<ActivitySchemaConfig>}
  */
 const ActivitySchema = new Schema(activity, {
     timestamps: {
@@ -112,6 +122,7 @@ const ActivitySchema = new Schema(activity, {
 
 /**
  * The model for the activity
+ * @type {import("mongoose").Model<ActivitySchemaConfig>}
  */
 const Activity = model("Activity", ActivitySchema);
 

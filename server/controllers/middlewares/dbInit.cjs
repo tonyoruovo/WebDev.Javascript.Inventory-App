@@ -1,6 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const asyncHandler = require("express-async-handler");
-const { v } = require("../../repos/utility.cjs");
+const { v } = require("../../repo/utility.cjs");
 /**
  * Constructs a middleware that initialises the database by connecting this user if they are not connected.
  * @param {import("../../server.cjs").DbObject} m The db session object to check if this user is connected.

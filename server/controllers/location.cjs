@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const { throws } = require("./middlewares/error.cjs");
 const {add, mod, ret, rem} = require("../data/location.cjs");
 const { Types } = require("mongoose");
+// const { Activity } = require("../models/activity.cjs");
 
 
 const get = asyncHandler(async function(rq, rs) {
@@ -15,6 +16,13 @@ const get = asyncHandler(async function(rq, rs) {
     }
 });
 const post = asyncHandler(async function(rq, rs) {
+    // const activity = new Activity({
+    //     _id: new Types.ObjectId(),
+    //     a: "create",
+    //     mn: "Location",
+    //     msg: undefined,
+    //     o: rq.user
+    // });
     try {
         const e = await add(rq.body);
         return rs.status(201).json(e);

@@ -1,7 +1,6 @@
 
 const mongoose = require("mongoose");
-const { US, GS } = require("../repos/utility.cjs");
-const { v } = require("../repos/utility.cjs");
+const { US, GS, v } = require("../repo/utility.cjs");
 
 /**
  * A class representing the full name of a person.

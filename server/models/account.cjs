@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 const { defMsg } = require("../data/d.cjs");
-const { v } = require("../repos/utility.cjs");
+const { v } = require("../repo/utility.cjs");
 const { Email } = require("./email.cjs");
 
 /**

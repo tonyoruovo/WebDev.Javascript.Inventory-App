@@ -2,10 +2,11 @@ const c = require("../config.json");
 const mongoose = require("mongoose");
 const { e404, handler } = require("./controllers/middlewares/error.cjs");
 const bodyParser = require("body-parser");
-const { v } = require("./repos/utility.cjs");
+const { v } = require("./repo/utility.cjs");
 const morgan = require("morgan");
 const { createWriteStream } = require("fs");
 const {join} = require("path");
+const { auto } = require("./controllers/middlewares/autoCon.cjs");
 
 /**
  * An object that retains a reference of the current session.
@@ -47,6 +48,7 @@ module.exports = () => {
     // mongoose.set("toJSON", { getters: true });
     mongoose.set("autoIndex", !c.inDev);
     mongoose.set("debug", c.inDev);
+    // mongoose.plugin()
 
     /**
      * @type {DbObject}
@@ -73,13 +75,13 @@ module.exports = () => {
     app.use(morgan("combined", {
         stream: createWriteStream(join(__dirname, 'access.log'), { flags: 'a' })
     }));
-    app.use("/api/v1/account", require("./routes/account.cjs"));
+    app.use("/api/v1/account", auto(mog), require("./routes/account.cjs"));
     app.use("/api/v1/address", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/address.cjs"));
     app.use("/api/v1/alert", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/alert.cjs"));
     app.use("/api/v1/amount", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/amount.cjs"));
     app.use("/api/v1/cmd", require("./routes/cmd.cjs"));
-    app.use("/api/v1/contact", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/contact.cjs"));
-    app.use("/api/v1/email", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/email.cjs"));
+    app.use("/api/v1/contact", auto(mog), require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/contact.cjs"));
+    app.use("/api/v1/email", require("./routes/email.cjs"));
     app.use("/api/v1/employee", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/employee.cjs"));
     app.use("/api/v1/location", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/location.cjs"));
     app.use("/api/v1/name", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/name.cjs"));

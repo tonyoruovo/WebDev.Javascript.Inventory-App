@@ -9,8 +9,8 @@
   },
   "scripts": {
     "test": "node index.test.js",
-    "start": "node index.js",
-    "watch": "nodemon index.js"
+    "start": "node index.js --trace-warnings",
+    "watch": "nodemon index.js --trace-warnings"
   },
   "repository": {
     "type": "git",
