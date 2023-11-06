@@ -1,6 +1,6 @@
 
 const { Types } = require("mongoose");
-const { Transaction } = require("../models/transaction.cjs");
+const { create } = require("../models/transaction.cjs");
 
 /**
  * An object containing reference(s) to composite types stored against an transaction in the {@linkcode Transaction} collection.
@@ -10,6 +10,8 @@ const { Transaction } = require("../models/transaction.cjs");
 /**
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total transaction.
  * @typedef {Object} TransactionDoc
+ * @property {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Transaction` model via {@linkcode create()}.
  * @property {string} msg any related comments, complaints, review, message etc for this transaction
  * @property {string} e {@linkcode Types.ObjectId} as a string representing the employee that approved (is responsible for) this transaction
  * @property {string} l {@linkcode Types.ObjectId} as a string representing the location from which this product will be shipped.
@@ -22,6 +24,7 @@ const { Transaction } = require("../models/transaction.cjs");
  * @returns {Promise<TransactionRef | TransactionRef[]>} a promise of references to the saved data.
  */
 const add = async p => {
+    const Transaction = create(p.connection);
     if(Array.isArray(p)) return await bulkAdd(p);
 
     const _ = {};
@@ -54,15 +57,19 @@ const bulkAdd = async p => {
 }
 /**
  * Retrieves this transaction's details from a given session (memory) or from the {@linkcode Transaction} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Transaction}
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Transaction` model via {@linkcode create()}.
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode Transaction}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * transaction model.
  * @returns {Promise<import("../models/transaction.cjs").TransactionSchemaConfig | import("../models/transaction.cjs").TransactionSchemaConfig[]>}
  * an object with the transaction id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-    if(Array.isArray(p)) return await bulkRet(p);
-    return await Transaction.findOne(p)
+    const Transaction = create(p.connection);
+    if(Array.isArray(p.query)) return await bulkRet(p.query);
+    return await Transaction.findOne(p.query)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
 }
@@ -87,13 +94,17 @@ const bulkRet = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Transaction} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Transaction` model via {@linkcode create()}.
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await Transaction.findByIdAndDelete(id).exec();
+const rem = async p => {
+    const Transaction = create(p.connection);
+	if (Array.isArray(p.id)) return await remBulk(p.id);
+	return await Transaction.findByIdAndDelete(p.id).exec();
 };
 
 /**
@@ -118,9 +129,12 @@ const remBulk = async ids => {
  * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of transaction to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/transaction.cjs").TransactionSchemaConfig>} p.query the query to be run
  * which will actually modify the transaction. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Transaction` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, TransactionSchemaConfig> & TransactionSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/transaction.cjs").TransactionSchemaConfig>>} an object with the transaction id
  */
 const mod = async p => {
+    const Transaction = create(p.connection);
     return await Transaction.findByIdAndUpdate(p.id, p.query);
 };
 

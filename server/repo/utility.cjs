@@ -1,3 +1,6 @@
+const { existsSync } = require("fs");
+const { join } = require("path");
+
 /**
  * Checks if the given value is `undefined` or `null` and returns `false` if it is, otherwise returns `true`.
  * @param {*} x the value to be checked
@@ -54,6 +57,17 @@ const hsh2 = (x) => {
   return b;
 };
 /**
+ * Performs backward recursion from the given `start` directory and returns the path to the first folder where a `package.json` exists.
+ * @param { string } start the directory from which path traversal begins.
+ * @returns { string } the path to the folder where the first `package.json` file was found
+ */
+const rootFolder = function(start = __dirname) {
+  while (!existsSync(join(start, "package.json"))) {
+    start = join(start, "..");
+  }
+  return start;
+}
+/**
  * @summary Simple compresser
  * @description Compresses a `bigint` into another `bigint` using bit folding
  * @param {bigint} x the value to be compressed
@@ -101,6 +115,7 @@ module.exports = {
   v,
   vt,
   vd,
+  rootFolder,
   hsh,
   hsh2,
   FS,

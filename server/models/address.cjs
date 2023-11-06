@@ -115,6 +115,12 @@ const AddressSchema = new mongoose.Schema(address, {
  * The address within a contact.
  * @type {import("mongoose").Model<AddressSchemaConfig>}
  */
-const Address = mongoose.model("Address", AddressSchema);
+// const Address = mongoose.model("Address", AddressSchema);
+/**
+ * Creates the `Address` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<AddressSchemaConfig>} the `Address` model created from the specified connection.
+ */
+const create = c => c.model("Address", AddressSchema);
 
-module.exports = {Address, AddressSchema};
+module.exports = {AddressSchema, create};

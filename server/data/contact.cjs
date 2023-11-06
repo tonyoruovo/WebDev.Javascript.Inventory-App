@@ -1,5 +1,5 @@
 const { Types } = require("mongoose");
-const { Contact } = require("../models/contact.cjs");
+const { create } = require("../models/contact.cjs");
 const { v } = require("../repo/utility.cjs");
 
 /**
@@ -13,6 +13,8 @@ const { v } = require("../repo/utility.cjs");
 /**
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total contact.
  * @typedef {Object} ContactDoc
+ * @property {import("mongoose").Connection} connection The accompanying connection to the mongodb. This allows access to
+ * the `Contact` model via {@linkcode create()}.
  * @property {string} [cn] alias for {@linkcode ContactDoc.companyName}
  * @property {string} [companyName] the name of the company that own this contact
  * @property {string} [msg] any relevant messsage for this contact
@@ -63,6 +65,8 @@ const add = async p => {
 
     _.account = new Types.ObjectId(p.ac || p.account);
 
+	const Contact = create(p.connection);
+
 	_.contact = (
 		await new Contact({
 			_id: new Types.ObjectId(),
@@ -97,15 +101,19 @@ const bulkAdd = async p => {
 };
 /**
  * Retrieves this contact's details from a given session (memory) or from the {@linkcode Contact} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Contact}
+ * @param {Object} p the parameter object.
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode Contact}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * contact model.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Contact` model via {@linkcode create()}.
  * @returns {Promise<import("../models/contact.cjs").ContactSchemaConfig | import("../models/contact.cjs").ContactSchemaConfig[]>}
  * an object with the contact id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-	if (Array.isArray(p)) return await bulkRet(p);
-	return await Contact.findOne(p).select("-_id -_cAt -_uAt -_vk").exec();
+	const Contact = create(p.connection);
+	if (Array.isArray(p.query)) return await bulkRet(p.query);
+	return await Contact.findOne(p.query).select("-_id -_cAt -_uAt -_vk").exec();
 };
 /**
  * Retrieves the details of the given contact using the array of queries to execute for each of the item to get.
@@ -127,13 +135,17 @@ const bulkRet = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Contact} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Contact` model via {@linkcode create()}.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await Contact.findByIdAndDelete(id).exec();
+const rem = async p => {
+	const Contact = create(p.connection)
+	if (Array.isArray(p.id)) return await remBulk(p.id);
+	return await Contact.findByIdAndDelete(p.id).exec();
 };
 
 /**
@@ -155,12 +167,15 @@ const remBulk = async ids => {
  * Modifies this contact's details i.e updates an contact.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object
  * @param {Object} p the parameter options
- * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of contact to be modified
+ * @param {import("mongoose").Schema.Types.ObjectId} p.id the id of contact to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/contact.cjs").ContactSchemaConfig>} p.query the query to be run
  * which will actually modify the contact. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Contact` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, ContactSchemaConfig> & ContactSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/contact.cjs").ContactSchemaConfig>>} an object with the contact id
  */
 const mod = async p => {
+	const Contact = create(p.connection);
 	return await Contact.findByIdAndUpdate(p.id, p.query);
 };
 

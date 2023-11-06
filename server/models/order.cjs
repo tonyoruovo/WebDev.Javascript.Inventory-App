@@ -1,8 +1,6 @@
 
-const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
-const { Subject } = require("./subject.cjs");
-const { Product } = require("./product.cjs");
 
 /**
  * Combining the "Purchase Order Model" and the "Sales Order Model" into a single "Order Model" while merging the "status" property
@@ -100,7 +98,7 @@ const order = {
         alias: "subject",
         validate: {
             validator: async function(x) {
-                return v(await Subject.findById(x).exec());
+                return v(await require("./subject.cjs").Subject.findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists`;
@@ -135,7 +133,7 @@ const order = {
             required: true,
             validate: {
                 validator: async function(x) {
-                    return v(await Product.findById(x).exec());
+                    return v(await require("./product.cjs").Product.findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists as a product`;
@@ -187,8 +185,14 @@ const OrderSchema = new Schema(order, {
  * The model for the order
  * @type {import("mongoose").Model<OrderSchemaConfig>}
  */
-const Order = model("Order", OrderSchema);
+// const Order = model("Order", OrderSchema);
+/**
+ * Creates the `Order` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<OrderSchemaConfig>} the `Order` model created from the specified connection.
+ */
+const create = c => c.model("Order", OrderSchema);
 
 module.exports = {
-    Order, OrderSchema
+    create, OrderSchema
 }

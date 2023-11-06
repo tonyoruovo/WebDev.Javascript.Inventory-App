@@ -1,6 +1,6 @@
 
 const { Types } = require("mongoose");
-const { Report } = require("../models/report.cjs");
+const { create } = require("../models/report.cjs");
 
 /**
  * An object containing reference(s) to composite types stored against an report in the {@linkcode Report} collection.
@@ -18,6 +18,8 @@ const { Report } = require("../models/report.cjs");
 /**
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total report.
  * @typedef {Object} ReportDoc
+ * @property {import("mongoose").Connection} connection The accompanying connection to the mongodb. This allows access to
+ * the `Report` model via {@linkcode create()}.
  * @property {string} msg The body of this report
  * @property {ReportParam[]} params The parameters and filters of this report
  * @property {"inventory-status" | "sales" | "purchases" | "financial" | "inventory-valuation" | "stock-reorder" | "product-movement" | "custom"} type The type of report being submitted.
@@ -31,6 +33,8 @@ const add = async p => {
     if(Array.isArray(p)) return await bulkAdd(p);
 
     const _ = {};
+
+    const Report = create(p.connection);
 
     _.report = ((await new Report({
         _id: new Types.ObjectId(),
@@ -58,15 +62,19 @@ const bulkAdd = async p => {
 }
 /**
  * Retrieves this report's details from a given session (memory) or from the {@linkcode Report} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Report}
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Report` model via {@linkcode create()}.
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode Report}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * report model.
  * @returns {Promise<import("../models/report.cjs").ReportSchemaConfig | import("../models/report.cjs").ReportSchemaConfig[]>}
  * an object with the report id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-    if(Array.isArray(p)) return await bulkRet(p);
-    return await Report.findOne(p)
+    const Report = create(p.connection);
+    if(Array.isArray(p.query)) return await bulkRet(p.query);
+    return await Report.findOne(p.query)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
 }
@@ -91,13 +99,17 @@ const bulkRet = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Report} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Report` model via {@linkcode create()}.
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await Report.findByIdAndDelete(id).exec();
+const rem = async p => {
+    const Report = create(p.connection);
+	if (Array.isArray(p.id)) return await remBulk(p.id);
+	return await Report.findByIdAndDelete(p.id).exec();
 };
 
 /**
@@ -119,12 +131,15 @@ const remBulk = async ids => {
  * Modifies this report's details i.e updates an report.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object
  * @param {Object} p the parameter options
- * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of report to be modified
+ * @param {import("mongoose").Schema.Types.ObjectId} p.id the id of report to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/report.cjs").ReportSchemaConfig>} p.query the query to be run
  * which will actually modify the report. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Report` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, ReportSchemaConfig> & ReportSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/report.cjs").ReportSchemaConfig>>} an object with the report id
  */
 const mod = async p => {
+    const Report = create(p.connection);
     return await Report.findByIdAndUpdate(p.id, p.query);
 };
 

@@ -17,38 +17,36 @@ const { auto } = require("./controllers/middlewares/autoCon.cjs");
  * @property {() => boolean} is checks if this has a valid session.
  * @property {() => boolean} ic checks if this has a valid connection to a database instance.
  * @property {() => Promise<void>} end checks if this has a valid session.
+ * @property {mongoose.Connection} robCon Robot Connection. This the connection used for automatically generated data.
  */
-/**
- * @typedef {Object} OperationModel
- * @property {string}
- */
-/**
- * An object for tracking models during a complex insert operation. For example: to insert data into the `Employee` model, one has
- * to have an id for the `Subject` model, to have an id for a subject, one has to have an id for the `Contact` model, to have an id
- * for the contact, one has to have an id for the following:
- * - a `Name` model
- * - an `Account` model
- * - an `Address` model
- * - a `Phone` model
- * 
- * `Account` and `Address` models have also complex data structure that require ids and so on. To mitigate accidentally inserting
- * 'incomplete' data for any model, an `Operation` object is required by the server, which will verify the type of operation that
- * will be performed. An `Operation` can be ended, or aborted. All operations are time-sensitive and will auto-abort after an
- * elapsed time.
- * @typedef {Object} Operation
- * @property {number} time the start time of this operation
- * @property {() => Promise<void>} save saves the all models associated with this `Operation`. If there is an any of the models cannot
- * be saved (maybe due to an imcompatible property) all models will not be saved. This prevents a suituation whereby there is 'dangling'
- * data on the db. E.g an `Email` model without an `Account` model that directly owns it.
- * @property
- */
-
 module.exports = () => {
     
     // mongoose.set("toJSON", { getters: true });
     mongoose.set("autoIndex", !c.inDev);
     mongoose.set("debug", c.inDev);
-    // mongoose.plugin()
+    mog.robCon = mongoose.createConnection("mongodb://", {
+        auth: {
+            password: "qwerty#123()",
+            username: "maintenance"
+        },
+        authSource: "admin",
+        dbName: "inventory",
+        directConnection: true,
+        pass: "qwerty#123()",
+        user: "maintenance",
+        localPort: 27017,
+        servername: "127.0.0.1",
+        host: "127.0.0.1",
+        connectTimeoutMS: 40000
+    });
+    setInterval(() => {
+        mog.robCon.model("Report").bulkSave([], {
+            dbName: "inventory",
+            authdb: "admin",
+            
+        })
+    }, )
+    mog.robCon.model("Report").findOne({})
 
     /**
      * @type {DbObject}
@@ -72,16 +70,16 @@ module.exports = () => {
     app.use(bodyParser.text());
     app.use(bodyParser.raw());
     app.use(bodyParser.urlencoded({extended: false}));
-    app.use(morgan("combined", {
+    app.use(morgan(c.inDev ? "dev" : "combined", {
         stream: createWriteStream(join(__dirname, 'access.log'), { flags: 'a' })
     }));
-    app.use("/api/v1/account", auto(mog), require("./routes/account.cjs"));
+    app.use("/api/v1/account", auto(), require("./routes/account.cjs"));
     app.use("/api/v1/address", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/address.cjs"));
     app.use("/api/v1/alert", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/alert.cjs"));
     app.use("/api/v1/amount", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/amount.cjs"));
     app.use("/api/v1/cmd", require("./routes/cmd.cjs"));
-    app.use("/api/v1/contact", auto(mog), require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/contact.cjs"));
-    app.use("/api/v1/email", require("./routes/email.cjs"));
+    app.use("/api/v1/contact", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/contact.cjs"));
+    app.use("/api/v1/email", auto(), require("./routes/email.cjs"));
     app.use("/api/v1/employee", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/employee.cjs"));
     app.use("/api/v1/location", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/location.cjs"));
     app.use("/api/v1/name", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/name.cjs"));

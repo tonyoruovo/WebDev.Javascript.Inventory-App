@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const { Account } = require("../../models/account.cjs");
 const { throws, nAuth } = require("./error.cjs");
-const { v } = require("../../repo/utility.cjs");
+const { v, rootFolder } = require("../../repo/utility.cjs");
 
 /**
  * Middleware for JWT authentication. This provides protection of routes for users and validation of Bearer authentication headers.
@@ -24,7 +24,7 @@ const auth = asyncHandler(
 		) {
 			try {
 				let t = req.headers.authorization.split(" ")[1];
-				const verified = jwt.verify(t, require("../../package.json").jwt);
+				const verified = jwt.verify(t, require(rootFolder() + "/config.json").jwt);
 				req.user = await Account.findById(verified.id).select("_id -_h");
 				if (!v(req.user) || !v(req.user._u)) nAuth(Error("Not Authourized"));
 				//   const c = await Contact.findOne({

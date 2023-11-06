@@ -1,5 +1,5 @@
 
-const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
 const { Contact } = require("./contact.cjs");
 const { PaymentTerm } = require("./paymentTerm.cjs");
@@ -121,8 +121,14 @@ const SubjectSchema = new Schema(subject, {
  * The model for the subject
  * @type {import("mongoose").Model<SubjectSchemaConfig>}
  */
-const Subject = model("Subject", SubjectSchema);
+// const Subject = model("Subject", SubjectSchema);
+/**
+ * Creates the `Subject` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<SubjectSchemaConfig>} the `Subject` model created from the specified connection.
+ */
+const create = c => c.model("Subject", SubjectSchema);
 
 module.exports = {
-    Subject, SubjectSchema
+    create, SubjectSchema
 }

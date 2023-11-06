@@ -3,7 +3,7 @@
  * @module activity
  */
 
-const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 
 /**
  * @typedef {Object} ActivitySchemaConfig
@@ -124,8 +124,14 @@ const ActivitySchema = new Schema(activity, {
  * The model for the activity
  * @type {import("mongoose").Model<ActivitySchemaConfig>}
  */
-const Activity = model("Activity", ActivitySchema);
+// const Activity = model("Activity", ActivitySchema);
+/**
+ * Creates the `Activity` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<ActivitySchemaConfig>} the `Activity` model created from the specified connection.
+ */
+const create = c => c.model("Activity", ActivitySchema);
 
 module.exports = {
-    Activity, ActivitySchema
+    ActivitySchema, create
 }

@@ -1,5 +1,5 @@
 
-const { Product } = require("../models/product.cjs");
+const { create } = require("../models/product.cjs");
 const { Types } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
 // const { tmpdir } = require("os");
@@ -14,6 +14,8 @@ const { v } = require("../repo/utility.cjs");
  */
 /**
  * @typedef {Object} ProductDoc
+ * @property {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Product` model via {@linkcode create()}.
  * @property {string} name the name of this product. Must be unique.
  * @property {string} [category] the category of this product
  * @property {string[]} [categories] the categories of this product, this is a synonym of {@linkcode ProductDoc.category}.
@@ -48,6 +50,7 @@ const { v } = require("../repo/utility.cjs");
 const add = async (p) => {
     if(Array.isArray(p)) return await bulkAdd(p);
 
+    const Product = create(p.connection);
     // const tmp = tmpdir();
 
     // const tempDir = mkdtempSync(`${tmp}${sep}`);
@@ -94,15 +97,19 @@ const bulkAdd = async p => {
 }
 /**
  * Retrieves this product's details from a given session (memory) or from the {@linkcode Product} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Product}
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Product` model via {@linkcode create()}.
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode Product}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * product model.
  * @returns {Promise<import("../models/product.cjs").ProductSchemaConfig | import("../models/product.cjs").ProductSchemaConfig[]>}
  * an object with the product id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-    if(Array.isArray(p)) return await bulkRet(p);
-    return await Product.findOne(p)
+    const Product = create(p.connection);
+    if(Array.isArray(p.query)) return await bulkRet(p.query);
+    return await Product.findOne(p.query)
     .populate({
         path: "_sp",
         model: "Subject",
@@ -133,12 +140,15 @@ const bulkRet = async p => {
  * Modifies this product's details i.e updates an product.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object
  * @param {Object} p the parameter options
- * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of product to be modified
+ * @param {import("mongoose").Schema.Types.ObjectId} p.id the id of product to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/product.cjs").ProductSchemaConfig>} p.query the query to be run
  * which will actually modify the product. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Product` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, ProductSchemaConfig> & ProductSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/product.cjs").ProductSchemaConfig>>} an object with the product id
  */
 const mod = async p => {
+    const Product = create(p.connection);
     return await Product.findByIdAndUpdate(p.id, p.query);
 }
 
@@ -147,13 +157,17 @@ const mod = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Product} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Product` model via {@linkcode create()}.
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await Product.findByIdAndDelete(id).exec();
+const rem = async p => {
+    const Product = create(p.connection);
+	if (Array.isArray(p.id)) return await remBulk(p.id);
+	return await Product.findByIdAndDelete(p.id).exec();
 };
 
 /**

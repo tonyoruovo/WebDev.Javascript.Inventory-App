@@ -162,6 +162,12 @@ const ContactSchema = new mongoose.Schema(contact, {
  * customer.
  * @type {import("mongoose").Model<ContactSchemaConfig>}
  */
-const Contact = mongoose.model("Contact", ContactSchema);
+// const Contact = mongoose.model("Contact", ContactSchema);
+/**
+ * Creates the `Contact` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<ContactSchemaConfig>} the `Contact` model created from the specified connection.
+ */
+const create = c => c.model("Contact", ContactSchema);
 
-module.exports = {Contact, ContactSchema};
+module.exports = {ContactSchema, create};

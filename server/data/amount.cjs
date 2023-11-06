@@ -1,6 +1,6 @@
 
 const { Types } = require("mongoose");
-const { Amount } = require("../models/amount.cjs");
+const { create } = require("../models/amount.cjs");
 
 /**
  * An object containing reference(s) to composite types stored against an amount in the {@linkcode Amount} collection.
@@ -10,7 +10,9 @@ const { Amount } = require("../models/amount.cjs");
 /**
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total amount.
  * @typedef {Object} AmountDoc
- * @property {string} [iso="566"] the 3-letter ISO code for the currency being used for this transaction. The default is the code
+ * @property {import("mongoose").Connection} connection The accompanying connection to the mongodb. This allows access to
+ * the `Amount` model via {@linkcode create()}.
+ * @property {string} [iso="566"] the 3-letter ISO currency code for the currency being used for this transaction. The default is the code
  * `"566"` which is the currency code for the Nigerian Naira.
  * @property {"a" | "add" | "subtract" | "s" | "multiply" | "m" | "divide" | "d" | "sqrt" | "cbrt" | "exp" | "percent" | "log"} [type="add"]
  * The type of relation this will have to the total (base) amount. For example, if this value is `"add"`, then the {@linkcode AmountDoc.value}
@@ -31,11 +33,13 @@ const add = async p => {
 
     const _ = {};
 
+    const Amount = create(p.connection);
+
     _.amount = ((await new Amount({
         _id: new Types.ObjectId(),
-        _cc: p.iso,
+        _cc: p.iso || "566",
         _ct: p.comment || p.comments,
-        _expiresAt: new Date(p.expiresAt),
+        _expiresAt: new Date(p.expiresAt || Date.now()),
         _t: p.type || "add",
         _v: p.value
     }).save())._id);
@@ -59,15 +63,19 @@ const bulkAdd = async p => {
 }
 /**
  * Retrieves this amount's details from a given session (memory) or from the {@linkcode Amount} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Amount}
+ * @param {Object} p the parameter object.
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode Amount}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * amount model.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Amount` model via {@linkcode create()}.
  * @returns {Promise<import("../models/amount.cjs").AmountSchemaConfig | import("../models/amount.cjs").AmountSchemaConfig[]>}
  * an object with the amount id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-    if(Array.isArray(p)) return await bulkRet(p);
-    return await Amount.findOne(p)
+    const Amount = create(p.connection);
+    if(Array.isArray(p.query)) return await bulkRet(p.query);
+    return await Amount.findOne(p.query)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
 }
@@ -92,13 +100,17 @@ const bulkRet = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Amount} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Amount` model via {@linkcode create()}.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await Amount.findByIdAndDelete(id).exec();
+const rem = async p => {
+    const Amount = create(p.connection);
+	if (Array.isArray(p.id)) return await remBulk(p.id);
+	return await Amount.findByIdAndDelete(p.id).exec();
 };
 
 /**
@@ -120,12 +132,15 @@ const remBulk = async ids => {
  * Modifies this amount's details i.e updates an amount.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object
  * @param {Object} p the parameter options
- * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of amount to be modified
+ * @param {import("mongoose").Schema.Types.ObjectId} p.id the id of amount to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/amount.cjs").AmountSchemaConfig>} p.query the query to be run
  * which will actually modify the amount. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Amount` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, AmountSchemaConfig> & AmountSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/amount.cjs").AmountSchemaConfig>>} an object with the amount id
  */
 const mod = async p => {
+    const Amount = create(p.connection);
     return await Amount.findByIdAndUpdate(p.id, p.query);
 };
 

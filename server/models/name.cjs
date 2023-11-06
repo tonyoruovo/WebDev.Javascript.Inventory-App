@@ -129,6 +129,12 @@ const NameSchema = new mongoose.Schema(name, {
  * The full name of a person.
  * @type {import("mongoose").Model<NameSchemaConfig>}
  */
-const Name = mongoose.model("Name", NameSchema);
+// const Name = mongoose.model("Name", NameSchema);
+/**
+ * Creates the `Name` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<NameSchemaConfig>} the `Name` model created from the specified connection.
+ */
+const create = c => c.model("Name", NameSchema);
 
-module.exports = {Name, NameSchema};
+module.exports = {create, NameSchema};

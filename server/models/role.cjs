@@ -1,4 +1,4 @@
-const { Schema, model, Types } = require("mongoose");
+const { Schema, Types } = require("mongoose");
 
 /**
  * An identifier of a given action in this api. When used in combination with authorization, it may represent the given duties and
@@ -156,8 +156,14 @@ const RoleSchema = new Schema(role, {
 /**
  * The model for the role schema
  */
-const Role = model("Role", RoleSchema);
+// const Role = model("Role", RoleSchema);
+/**
+ * Creates the `Role` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<RoleSchemaConfig>} the `Role` model created from the specified connection.
+ */
+const create = c => c.model("Role", RoleSchema);
 
 module.exports = {
-    RoleSchema, Role
+    RoleSchema, create
 }

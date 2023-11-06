@@ -4,9 +4,7 @@
  * @module amount
  */
 
-const { Schema, model } = require("mongoose");
-
-// const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 
 /**
  * Amount models are meant to be immutable, hence whenever a price is changed, the old `Amount` model
@@ -94,13 +92,18 @@ const AmountSchema = new Schema(amount, {
     //     granularity: "seconds"
     // }
 });
-
 /**
  * The model for the amount schema
  * @type {import("mongoose").Model<AmountSchemaConfig>}
  */
-const Amount = model("Amount", AmountSchema);
+// const Amount = model("Amount", AmountSchema);
+/**
+ * Creates the `Amount` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<AmountSchemaConfig>} the `Amount` model created from the specified connection.
+ */
+const create = c => c.model("Amount", AmountSchema);
 
 module.exports = {
-    Amount, AmountSchema,
+    AmountSchema, create
 }

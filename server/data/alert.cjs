@@ -1,6 +1,6 @@
 
 const { Types } = require("mongoose");
-const { Alert } = require("../models/alert.cjs");
+const { create } = require("../models/alert.cjs");
 /**
  * @typedef {Object} AlertRef
  * @property {Types.ObjectId} alert
@@ -9,6 +9,8 @@ const { Alert } = require("../models/alert.cjs");
  * An object whose properties map to the {@linkcode Alert} model, as such, is used to instantiate the model, which is stored in
  * an `Alert` collection afterwards.
  * @typedef {Object} AlertDoc
+ * @property {import("mongoose").Connection} connection The accompanying connection to the mongodb. This allows access to
+ * the `Alert` model via {@linkcode create()}.
  * @property {"low-stock" | "expiration" | "confirm" | "shipment" | "payment" | "error" | "security" | "other"} type the type of alert.
  * @property {string} msg The alert message that is constructed by hand.
  */
@@ -21,6 +23,7 @@ const add = async p => {
     if(Array.isArray(p)) return await bulkAdd(p);
 
     const _ = {};
+	const Alert = create(p.connection);
 
     _.alert = ((await new Alert({
         _id: new Types.ObjectId(),
@@ -47,15 +50,19 @@ const bulkAdd = async p => {
 }
 /**
  * Retrieves this alert's details from a given session (memory) or from the {@linkcode Alert} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Alert}
+ * @param {Object} p the parameter object
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode Alert}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * alert model.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Alert` model via {@linkcode create()}.
  * @returns {Promise<import("../models/alert.cjs").AlertSchemaConfig | import("../models/alert.cjs").AlertSchemaConfig[]>}
  * an object with the alert id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-    if(Array.isArray(p)) return await bulkRet(p);
-    return await Alert.findOne(p)
+	const Alert = create(p.connection);
+    if(Array.isArray(p.query)) return await bulkRet(p.query);
+    return await Alert.findOne(p.query)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
 }
@@ -80,13 +87,17 @@ const bulkRet = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Alert} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Alert` model via {@linkcode create()}.
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await Alert.findByIdAndDelete(id).exec();
+const rem = async p => {
+	const Alert = create(p.connection);
+	if (Array.isArray(p.connection)) return await remBulk(p.connection);
+	return await Alert.findByIdAndDelete(p.connection).exec();
 };
 
 /**
@@ -111,9 +122,12 @@ const remBulk = async ids => {
  * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of alert to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/alert.cjs").AlertSchemaConfig>} p.query the query to be run
  * which will actually modify the alert. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Alert` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, AlertSchemaConfig> & AlertSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/alert.cjs").AlertSchemaConfig>>} an object with the alert id
  */
 const mod = async p => {
+	const Alert = create(p.connection);
     return await Alert.findByIdAndUpdate(p.id, p.query);
 };
 

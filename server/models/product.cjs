@@ -1,5 +1,5 @@
 const { v } = require("../repo/utility.cjs");
-const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 const { Subject } = require("./subject.cjs");
 const { Amount } = require("./amount.cjs");
 
@@ -154,9 +154,15 @@ const ProductSchema = new Schema(product, {
  * The model for the product schema
  * @type {import("mongoose").Model<ProductSchemaConfig>}
  */
-const Product = model("Product", ProductSchema);
+// const Product = model("Product", ProductSchema);
+/**
+ * Creates the `Product` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<ProductSchemaConfig>} the `Product` model created from the specified connection.
+ */
+const create = c => c.model("Product", ProductSchema);
 
 module.exports = {
 	ProductSchema,
-	Product
+	create
 };

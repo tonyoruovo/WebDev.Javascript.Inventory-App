@@ -62,16 +62,19 @@ const EmployeeSchema = new Schema(employee, {
         updatedAt: "_uAt"
     },
     versionKey: "_vk"
-})
-/**
- * @typedefw {Object & Model<{},{},{},{},{}, EmployeeSchema>} EmployeeModel
- */
+});
 /**
  * The model for the employee schema
  * @type {import("mongoose").Model<EmployeeSchemaConfig>}
  */
-const Employee = model("Employee", EmployeeSchema);
+// const Employee = model("Employee", EmployeeSchema);
+/**
+ * Creates the `Employee` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<EmployeeSchemaConfig>} the `Employee` model created from the specified connection.
+ */
+const create = c => c.model("Employee", EmployeeSchema);
 
 module.exports = {
-    Employee, EmployeeSchema
+    create, EmployeeSchema
 }

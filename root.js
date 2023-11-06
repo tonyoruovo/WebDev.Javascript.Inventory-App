@@ -1,5 +1,5 @@
-import { fileURLToPath } from "url";
-import fs from "fs";
+const { fileURLToPath } = require("url");
+const fs = require("fs");
 /**
  * @module package.json
  */
@@ -17,8 +17,7 @@ const root = fileURLToPath(__dirname);
  */
 const pj = JSON.parse(fs.readFileSync(`${root}package.json`, "utf-8"));
 
-export default root;
 /**
  * @exports package.json
  */
-export { pj };
+module.exports = {root,pj};

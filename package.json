@@ -9,8 +9,8 @@
   },
   "scripts": {
     "test": "node index.test.js",
-    "start": "node index.js --trace-warnings",
-    "watch": "nodemon index.js --trace-warnings"
+    "start": "node --trace-warnings index.js",
+    "watch": "nodemon --trace-warnings"
   },
   "repository": {
     "type": "git",
@@ -41,8 +41,5 @@
     "@types/node": "^20.8.2",
     "eslint": "^8.50.0",
     "nodemon": "^3.0.1"
-  },
-  "jwt": "qwerty#123()",
-  "adminJWT": "250094qwertydelicious#123()mum",
-  "private_key": "secret"
+  }
 }

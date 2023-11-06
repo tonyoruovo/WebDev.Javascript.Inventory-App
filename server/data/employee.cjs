@@ -1,5 +1,5 @@
 const { Types } = require("mongoose");
-const { Employee } = require("../models/employee.cjs");
+const { create } = require("../models/employee.cjs");
 
 /**
  * A reference to a created {@linkcode Employee} model inside a transaction that is yet to saved and committed.
@@ -20,6 +20,8 @@ const { Employee } = require("../models/employee.cjs");
 /**
  * A js object with the neccessary properties for creating an {@link Employee}.
  * @typedef {Object} EmployeeDoc
+ * @property {import("mongoose").Connection} connection The accompanying connection to the mongodb. This allows access to
+ * the `Employee` model via {@linkcode create()}.
  * @property {string} [sig] the image data of the signature of this employee as a `string`.
  * @property {string} subject {@linkcode Types.ObjectId} as a string representing the signature of this employee.
  * @property {string} s alias for {@linkcode EmployeeDoc.subject}
@@ -41,6 +43,8 @@ const set = async p => {
 	const _ = {};
 
 	_.subject = new Types.ObjectId(p.subject);
+
+	const Employee = create(p.connection);
 
 	_.employee = (await new Employee({
 		_id: new Types.ObjectId(),
@@ -68,28 +72,35 @@ const bulkSet = async p => {
  * Modifies this employee's details i.e updates an employee.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object
  * @param {Object} p the parameter options
- * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of employee to be modified
+ * @param {import("mongoose").Schema.Types.ObjectId} p.id the id of employee to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/employee.cjs").EmployeeSchemaConfig>} p.query the query to be run
  * which will actually modify the employee. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Employee` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, EmployeeSchemaConfig> & EmployeeSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/employee.cjs").EmployeeSchemaConfig>>} an object with the employee id
  */
 const mod = async p => {
-	return await Employee.findByIdAndUpdate(p._id, p.query);
+	const Employee = create(p.connection);
+	return await Employee.findByIdAndUpdate(p.id, p.query);
 };
 /**
  * Retrieves this employee's details from a given session (memory) or from the {@linkcode Employee} collection.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the retrieval is meant
  * to be done on the {@linkcode Employee} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be returned.
- * @param {Record<string, any> | Record<string, any>[]} p the condition (predicate) whereby a singular {@linkcode Employee}
+ * @param {Object} p the parameter object.
+ * @param {Record<string, any> | Record<string, any>[]} p.query the condition (predicate) whereby a singular {@linkcode Employee}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * employee model.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Employee` model via {@linkcode create()}.
  * @returns {Promise<import("../models/employee.cjs").EmployeeSchemaConfig | import("../models/employee.cjs").EmployeeSchemaConfig[]>}
  * an object with the employee id. Will be an array if the second argument is an array.
  */
 const get = async p => {
-	if (Array.isArray(p)) return bulkGet(p);
-	return await Employee.findOne(p)
+	const Employee = create(p.connection);
+	if (Array.isArray(p.query)) return bulkGet(p.query);
+	return await Employee.findOne(p.query)
 		.populate({
 			path: "_a",
 			model: "Account",
@@ -112,7 +123,7 @@ const get = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the retrieval is meant
  * to be done on the {@linkcode Employee} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be returned.
- * @param {Record<string, any> | Record<string, any>[]} p the condition (predicate) whereby a singular {@linkcode Employee}
+ * @param {Record<string, any>[]} p the condition (predicate) whereby a singular {@linkcode Employee}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * employee model.
  * @returns {import("../models/employee.cjs").EmployeeSchemaConfig[]} array of objects each with the employee id
@@ -129,13 +140,17 @@ const bulkGet = p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Employee} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Employee` model via {@linkcode create()}.
  * @returns {Promise<any | any[]>} any value
  */
-const del = async id => {
-	if (Array.isArray(id)) return delBulk(id);
-	return await Employee.findByIdAndDelete(id).exec();
+const del = async p => {
+	const Employee= create(p.connection);
+	if (Array.isArray(p.id)) return delBulk(p.id);
+	return await Employee.findByIdAndDelete(p.id).exec();
 };
 /**
  * Deletes this employees from a given session (memory) or from the {@linkcode Employee} collection.
@@ -162,7 +177,7 @@ const ini = async m => {
 	if (!m.is()) {
 		m.s = await m.con.startSession();
 		// console.log(m.s);
-		m.n = Employee.name;
+		m.n = "Employee";
 	}
 	return m;
 };

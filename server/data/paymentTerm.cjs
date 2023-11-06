@@ -1,6 +1,6 @@
 
 const { Types } = require("mongoose");
-const { PaymentTerm } = require("../models/paymentTerm.cjs");
+const { create } = require("../models/paymentTerm.cjs");
 
 /**
  * An object containing reference(s) to composite types stored against a paymentTerm in the {@linkcode PaymentTerm} collection.
@@ -12,6 +12,8 @@ const { PaymentTerm } = require("../models/paymentTerm.cjs");
  * An Object whose properties map to the {@linkcode PaymentTerm} model, as such, is used to instantiate the model, which is added
  * to an array of the {@linkcode PaymentTerm}.
  * @typedef {Object} PaymentTermDoc
+ * @property {import("mongoose").Connection} connection The accompanying connection to the mongodb. This allows access to
+ * the `PaymentTerm` model via {@linkcode create()}.
  * @property {string} t_c the terms and conditions regarding this payment term. This is required.
  * @property {number} [period] a number relating to the duration of the payment. If this value is `4` and {@linkcode PaymentTermDoc.interval}
  * is `'day'`, then payment is expected the amount given will be split into 4 days. This is required only if this term is a partial
@@ -19,7 +21,7 @@ const { PaymentTerm } = require("../models/paymentTerm.cjs");
  * @property {"second" | "minute" | "hour" | "day" | "week" | "month" | "year" | "decade"} [interval="day"] the unit of time being used for partial
  * payments.
  * @property {string[]} amounts an array of {@linkcode Types.ObjectId} objects as strings representing all deductions, reductions, prices, taxes, bills, charges, promos etc.
- * @property {"cheque" | "check" | "cash" | "wire" | "credit" | "etf"} paymentType the payment method. the `"etf"` option stands for
+ * @property {"cheque" | "check" | "cash" | "wire" | "credit" | "etf"} [paymentType="cash"] the payment method. the `"etf"` option stands for
  * *E*lectronic *T*ransfer *F*unds these include (paypal, verve, interswitch, crypto etc).
  * @property {string[]} codes important codes and numbers related to this payment term, for example account numbers, transfer
  * tokens, wallet ids etc. The alias is `paymentCodes`.
@@ -34,16 +36,18 @@ const add = async p => {
 
     const _ = {};
 
+    const PaymentTerm = create(p.connection);
+
     _.amounts = p.amounts.map(x => new Types.ObjectId(x));
 
     _.paymentTerm = ((await new PaymentTerm({
         _id: new Types.ObjectId(),
         _a: _.amounts,
         _ic: p.codes,
-        _it: p.interval,
-        _prd: p.period,
+        _it: p.interval || "day",
+        _prd: p.period || 1,
         _tc: p.t_c,
-        _ty: p.paymentType
+        _ty: p.paymentType || "cash"
     }).save())._id);
 
     return _;
@@ -65,15 +69,19 @@ const bulkAdd = async p => {
 }
 /**
  * Retrieves this paymentTerm's details from a given session (memory) or from the {@linkcode PaymentTerm} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode PaymentTerm}
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `PaymentTerm` model via {@linkcode create()}.
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode PaymentTerm}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * paymentTerm model.
  * @returns {Promise<import("../models/paymentTerm.cjs").PaymentTermSchemaConfig | import("../models/paymentTerm.cjs").PaymentTermSchemaConfig[]>}
  * an object with the paymentTerm id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-    if(Array.isArray(p)) return await bulkRet(p);
-    return await PaymentTerm.findOne(p)
+    const PaymentTerm = create(p.connection);
+    if(Array.isArray(p.query)) return await bulkRet(p.query);
+    return await PaymentTerm.findOne(p.query)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
 }
@@ -98,13 +106,17 @@ const bulkRet = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode PaymentTerm} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `PaymentTerm` model via {@linkcode create()}.
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await PaymentTerm.findByIdAndDelete(id).exec();
+const rem = async p => {
+    const PaymentTerm = create(p.connection);
+	if (Array.isArray(p.id)) return await remBulk(p.id);
+	return await PaymentTerm.findByIdAndDelete(p.id).exec();
 };
 
 /**
@@ -126,12 +138,15 @@ const remBulk = async ids => {
  * Modifies this paymentTerm's details i.e updates an paymentTerm.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object
  * @param {Object} p the parameter options
- * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of paymentTerm to be modified
+ * @param {import("mongoose").Schema.Types.ObjectId} p.id the id of paymentTerm to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/paymentTerm.cjs").PaymentTermSchemaConfig>} p.query the query to be run
  * which will actually modify the paymentTerm. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `PaymentTerm` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, PaymentTermSchemaConfig> & PaymentTermSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/paymentTerm.cjs").PaymentTermSchemaConfig>>} an object with the paymentTerm id
  */
 const mod = async p => {
+    const PaymentTerm = create(p.connection);
     return await PaymentTerm.findByIdAndUpdate(p.id, p.query);
 };
 

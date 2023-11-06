@@ -1,30 +1,41 @@
-const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
 const { PaymentTerm } = require("./paymentTerm.cjs");
 const { Contact } = require("./contact.cjs");
-const UnitSchema = new Schema({
-    value: {
+/**
+ * @typedef {Object} UnitSchemaConfig
+ * @property {Schema.Types.ObjectId} _id
+ * @property {import("../data/d.cjs").Options<Schema.Types.Number, UnitSchemaConfig>} _v the numerical value. The alias is `value`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, UnitSchemaConfig>} _u the unit of measurement such as "kilogram", "kilogramme", "kg" etc. The alias is `unit`.
+ */
+/**
+ * @type {UnitSchemaConfig}
+ */
+const unit = {
+    _v: {
         type: Schema.Types.Number,
         min: 0,
-        required: true
+        required: true,
+        alias: "value"
     },
-    unit: {
+    _u: {
         type: Schema.Types.String,
-        required: true
+        required: true,
+        alias: "unit",
+        lowercase: true
     }
-});
+}
 /**
- * A contextual definition of a number.
- * @typedef {Object} Unit
- * @property {number} value the numerical value.
- * @property {string} unit the unit in which context the value is represented.
+ * The instantiated `UnitSchema` object.
+ * @type {Schema<UnitSchemaConfig>}
  */
+const UnitSchema = new Schema(unit);
 /**
  * @typedef {Object} LocationSchemaConfig
  * @property {Schema.Types.ObjectId} _id The mongoose id for this location.
  * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, LocationSchemaConfig>} _c the contacts of this location. The
  * alias is `contact`. The reference is `Contact`.
- * @property {import("../data/d.cjs").Options<Unit, LocationSchemaConfig>} _cp the capacity of this location. This
+ * @property {import("../data/d.cjs").Options<UnitSchemaConfig, LocationSchemaConfig>} _cp the capacity of this location. This
  * refers to maximum number of products it can store.
  * @property {import("../data/d.cjs").Options<[Schema.Types.ObjectId], LocationSchemaConfig>} _pt the payment terms for this
  * location. The alias is `paymentTerms`. The ref is `PaymentTerm`.
@@ -119,9 +130,20 @@ const LocationSchema = new Schema(location, {
  * The model for the location
  * @type {import("mongoose").Model<LocationSchemaConfig>}
  */
-const Location = model("Location", LocationSchema);
+// const Location = model("Location", LocationSchema);
+/**
+ * Creates the `Location` (or `Unit`) model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {boolean} l use location model? if yes then `Location` model will be returned, else a `Unit` model is returned.
+ * @returns {import("mongoose").Model<LocationSchemaConfig | UnitSchemaConfig>} the `Location` (or `Unit`) model created from the specified connection.
+ */
+const create = (c,l = true) => l ? c.model("Location", LocationSchema) : c.model("Unit",UnitSchema);
+/**
+ * The model for the unit
+ * @type {import("mongoose").Model<UnitSchemaConfig>}
+ */
 // const Unit = model("Unit", UnitSchema);
 
 module.exports = {
-    Location, LocationSchema//, Unit, UnitSchema
+    create, LocationSchema, UnitSchema
 }

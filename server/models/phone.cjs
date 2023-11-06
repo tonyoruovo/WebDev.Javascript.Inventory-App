@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 
 /**
  * @typedef {Object} PhoneSchemaConfig
- * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this phone number which is also the atual phone number value.
+ * @property {mongoose.Schema.Types.ObjectId} _id the mongoose id of this phone number.
+ * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, PhoneSchemaConfig>} _n the actual phone value.
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.String, PhoneSchemaConfig>} _c the country code. The ISO
  * country code of the given phone number
  * @property {import("../data/d.cjs").Options<mongoose.Schema.Types.Number, PhoneSchemaConfig>} _pf the preference of this number.
@@ -37,6 +38,15 @@ const mongoose = require("mongoose");
  */
 const phone = {
     _id: mongoose.Schema.Types.ObjectId,
+    _n: {
+        type: mongoose.Schema.Types.String,
+        unique: true,
+        required: true,
+        alias:"number",
+        minlength: 11,
+        maxlength: 11,
+        match: /^\d\d{9}\d$/g
+    },
     _t: {
         type: mongoose.Schema.Types.String,
         alias:"numberType",
@@ -86,8 +96,14 @@ const PhoneSchema = new mongoose.Schema(phone, {
  * The phone number of a contact.
  * @type {mongoose.Model<PhoneSchemaConfig>}
  */
-const Phone = mongoose.model("Phone", PhoneSchema);
+// const Phone = mongoose.model("Phone", PhoneSchema);
+/**
+ * Creates the `Phone` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<PhoneSchemaConfig>} the `Phone` model created from the specified connection.
+ */
+const create = c => c.model("Phone", PhoneSchema);
 
 module.exports = {
-    PhoneSchema, Phone
+    PhoneSchema, create
 }

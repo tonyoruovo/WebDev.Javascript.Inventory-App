@@ -1,12 +1,13 @@
-const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 const { defMsg } = require("../data/d.cjs");
 const { v } = require("../repo/utility.cjs");
 const { Email } = require("./email.cjs");
 
 /**
  * @typedef {Object} AccountSchemaConfig
- * @property {Schema.Types.ObjectId} _id the mongoose id of this account. This is instantiated from the username.
+ * @property {Schema.Types.ObjectId} _id the mongoose id of this account.
  * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, AccountSchemaConfig>} _e the email.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _u the username. The range is [3, 24].
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _h the hashed pass.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _s the status.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _p the provider (for external accounts such as facebook, google, twitter).
@@ -14,7 +15,6 @@ const { Email } = require("./email.cjs");
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _at the provider access token.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _rt the provider refresh token (for oauth).
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _ats the provider access token secret (for twitter).
- * @todo removed property {import("../data/d.cjs").Options<Schema.Types.String, AccountSchemaConfig>} _u the username. The range is [3, 24].
  */
 /**
  * @type {AccountSchemaConfig}
@@ -46,7 +46,9 @@ const account = {
             },
             message: defMsg
         },
-        required: [true, "username must be provided"],
+        required: [function(){
+            return !v(this._p);
+        }, "username must be provided"],
         unique: true,
         alias: "username"
     },
@@ -77,7 +79,7 @@ const account = {
             }
         },
         required: function(){
-            return v(this._pid) || v(this._at) || v(this._rt) || v(this._ats);
+            return !v(this._u);
         }
     },
     _pid: {
@@ -161,8 +163,14 @@ const AccountSchema = new Schema(account, {
  * The model for the account
  * @type {import("mongoose").Model<AccountSchemaConfig>}
  */
-const Account = model("Account", AccountSchema);
+// const Account = model("Account", AccountSchema);
+/**
+ * Creates the `Account` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<AccountSchemaConfig>} the `Account` model created from the specified connection.
+ */
+const create = c => c.model("Account", AccountSchema);
 
 module.exports = {
-    Account, AccountSchema
+    AccountSchema, create
 }

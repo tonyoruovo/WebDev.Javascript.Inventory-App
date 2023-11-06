@@ -1,6 +1,6 @@
 
 const { Types } = require("mongoose");
-const { Address } = require("../models/address.cjs");
+const { create } = require("../models/address.cjs");
 
 /**
  * An object containing reference(s) to composite types stored against an address in the {@linkcode Address} collection.
@@ -10,6 +10,8 @@ const { Address } = require("../models/address.cjs");
 /**
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total address.
  * @typedef {Object} AddressDoc
+ * @property {import("mongoose").Connection} connection The accompanying connection to the mongodb. This allows access to
+ * the `Address` model via {@linkcode create()}.
  * @property {string} [msg] any related comments, complaints, review, message etc for this address
  * @property {string} s alias for {@linkcode AddressDoc.street}
  * @property {string} street the street name and number
@@ -23,8 +25,8 @@ const { Address } = require("../models/address.cjs");
  * @property {string} [lga] the local government area in which the given street is located.
  * @property {string} [st] alias for {@linkcode AddressDoc.state}
  * @property {string} [state] the state in which the given street is located.
- * @property {string} [cc] alias for {@linkcode AddressDoc.cCode}
- * @property {string} [cCode] the 3-letter iso country code of the country in which the given street is located.
+ * @property {string} [cc="234"] alias for {@linkcode AddressDoc.cCode}
+ * @property {string} [cCode="234"] the 3-letter iso country code of the country in which the given street is located.
  */
 /**
  * Adds the given address to the {@linkcode Address} collection.
@@ -36,6 +38,8 @@ const add = async p => {
 
     const _ = {};
 
+	const Address = create(p.connection);
+
     _.address = ((await new Address({
         _id: new Types.ObjectId(),
         _s: p.s || p.street,
@@ -45,7 +49,7 @@ const add = async p => {
         _lg: p.lg || p.lga,
         _com: p.msg,
         _st: p.st || p.state,
-        _cc: p.cc || p.cCode
+        _cc: p.cc || p.cCode || "234"
     }).save())._id);
 
     return _;
@@ -67,13 +71,17 @@ const bulkAdd = async p => {
 }
 /**
  * Retrieves this address's details from a given session (memory) or from the {@linkcode Address} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Address}
+ * @param {Object} p the parameter
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode Address}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * address model.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Address` model via {@linkcode create()}.
  * @returns {Promise<import("../models/address.cjs").AddressSchemaConfig | import("../models/address.cjs").AddressSchemaConfig[]>}
  * an object with the address id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
+	const Address = create(p.connection);
     if(Array.isArray(p)) return await bulkRet(p);
     return await Address.findOne(p)
     .select("-_id -_cAt -_uAt -_vk")
@@ -100,13 +108,17 @@ const bulkRet = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Address} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Address` model via {@linkcode create()}.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await Address.findByIdAndDelete(id).exec();
+const rem = async p => {
+	const Address = create(p.connection);
+	if (Array.isArray(p.id)) return await remBulk(p.id);
+	return await Address.findByIdAndDelete(p.id).exec();
 };
 
 /**
@@ -131,9 +143,12 @@ const remBulk = async ids => {
  * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of address to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/address.cjs").AddressSchemaConfig>} p.query the query to be run
  * which will actually modify the address. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Address` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, AddressSchemaConfig> & AddressSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/address.cjs").AddressSchemaConfig>>} an object with the address id
  */
 const mod = async p => {
+	const Address = create(p.connection);
     return await Address.findByIdAndUpdate(p.id, p.query);
 };
 

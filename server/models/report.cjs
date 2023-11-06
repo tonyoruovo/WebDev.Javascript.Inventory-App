@@ -1,5 +1,5 @@
 
-const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
 
 /**
@@ -124,8 +124,14 @@ const ReportSchema = new Schema(report, {
  * The model for the report
  * @type {import("mongoose").Model<ReportSchemaConfig>}
  */
-const Report = model("Report", ReportSchema);
+// const Report = model("Report", ReportSchema);
+/**
+ * Creates the `Report` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<ReportSchemaConfig>} the `Report` model created from the specified connection.
+ */
+const create = c => c.model("Report", ReportSchema);
 
 module.exports = {
-    Report, ReportSchema
+    create, ReportSchema
 }

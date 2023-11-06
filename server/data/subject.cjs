@@ -1,6 +1,6 @@
 
 const { Types } = require("mongoose");
-const { Subject } = require("../models/subject.cjs");
+const { create } = require("../models/subject.cjs");
 /**
  * An object containing reference to composite types stored against a subject in the {@linkcode Subject} collection.
  * @typedef {Object} SubjectRef
@@ -12,6 +12,8 @@ const { Subject } = require("../models/subject.cjs");
  * An object whose properties map to the {@linkcode Subject} model, as such, is used to instantiate the model, which is stored in
  * a `Subject` collection afterwards.
  * @typedef {Object} SubjectDoc
+ * @property {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Subject` model via {@linkcode create()}.
  * @property {string[]} paymentTerms an array of {@linkcode Types.ObjectId} objects as a string representing the payment term of this subject.
  * @property {string} contact {@linkcode Types.ObjectId} as a string representing the id of the contact
  * @property {"male" | "m" | "female" | "f"} gender the gender of this subject
@@ -24,6 +26,7 @@ const { Subject } = require("../models/subject.cjs");
  * @returns {Promise<SubjectRef | SubjectRef[]>} a promise of references to the saved data.
  */
 const add = async p => {
+    const Subject = create(p.connection);
     if(Array.isArray(p)) return await bulkAdd(p);
 
     const _ = {};
@@ -58,15 +61,19 @@ const bulkAdd = async p => {
 }
 /**
  * Retrieves this subject's details from a given session (memory) or from the {@linkcode Subject} collection.
- * @param {Record<string, any> | Record<string, any>[]} p the mongoose query (predicate) whereby a singular {@linkcode Subject}
+ * @param {Object} p the parameter object.
+ * @param {Record<string, any> | Record<string, any>[]} p.query the mongoose query (predicate) whereby a singular {@linkcode Subject}
  * document will be retrieved. If this is an array, then a each index is assumed to contain the predicate for a single
  * subject model.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Subject` model via {@linkcode create()}.
  * @returns {Promise<import("../models/subject.cjs").SubjectSchemaConfig | import("../models/subject.cjs").SubjectSchemaConfig[]>}
  * an object with the subject id. Will be an array if the second argument is an array.
  */
 const ret = async p => {
-    if(Array.isArray(p)) return await bulkRet(p);
-    return await Subject.findOne(p)
+    const Subject = create(p.connection);
+    if(Array.isArray(p.query)) return await bulkRet(p.query);
+    return await Subject.findOne(p.query)
     .populate({
         path: "_c",
         model: "Contact",
@@ -95,13 +102,17 @@ const bulkRet = async p => {
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
  * to be done on the {@linkcode Subject} collection and not on the session. If it meant to be done on the session, then this
  * value must be valid, else no value will be deleted.
- * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} id the object id of the value to be deleted. Can be an array for
+ * @param {Object} p the parameter object.
+ * @param {import("mongoose").Schema.Types.ObjectId | import("mongoose").Schema.Types.ObjectId[]} p.id the object id of the value to be deleted. Can be an array for
  * multiple values.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Subject` model via {@linkcode create()}.
  * @returns {Promise<any | any[]>} any value
  */
-const rem = async id => {
-	if (Array.isArray(id)) return await remBulk(id);
-	return await Subject.findByIdAndDelete(id).exec();
+const rem = async p => {
+    const Subject = create(p.connection);
+	if (Array.isArray(p.id)) return await remBulk(p.id);
+	return await Subject.findByIdAndDelete(p.id).exec();
 };
 
 /**
@@ -126,9 +137,12 @@ const remBulk = async ids => {
  * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of subject to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/subject.cjs").SubjectSchemaConfig>} p.query the query to be run
  * which will actually modify the subject. This is the modification query.
+ * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * the `Subject` model via {@linkcode create()}.
  * @returns {Promise<import("mongoose").Query<Document<unknown, any, SubjectSchemaConfig> & SubjectSchemaConfig & Required<{_id: import("mongoose").Schema.Types.ObjectId}>, import("../models/subject.cjs").SubjectSchemaConfig>>} an object with the subject id
  */
 const mod = async p => {
+    const Subject = create(p.connection);
     return await Subject.findByIdAndUpdate(p.id, p.query);
 };
 

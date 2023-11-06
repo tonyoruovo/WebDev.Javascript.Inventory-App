@@ -1,12 +1,13 @@
 const fs = require("fs");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const root = require("../../package.json");
+const ky = require("../../config.json").pem_key;
+const { rootFolder } = require("./utility.cjs");
 /**
  * This algorithm is copied from geeksforgeeks.org
  */
 /**
- * Creates a file name 'private_key' at the root of this project which stored info
+ * Creates a file name 'private_key.pem' at the root of this project which stored info
  * regarding the algorithm for encryption/decryption of data
  * @param {string} passcode the secret key for public and private decryption
  * @param {number} keyBits the value specifying the largest number of bits that this
@@ -30,12 +31,12 @@ function generateKeyFiles(passcode, keyBits) {
   });
 
   //create private key file
-  fs.writeFileSync("./private_key", keyPair.privateKey);
+  fs.writeFileSync(rootFolder() + "/private_key.pem", keyPair.privateKey);
   //writeFileSync("public_key", keyPair.publicKey);
 }
 
-if (!fs.existsSync("./private_key"))
-  generateKeyFiles(root.private_key, 1024);
+if (!fs.existsSync(rootFolder() + "/private_key.pem"))
+  generateKeyFiles(ky, 1024);
 
 /**
  * Encrypts the first argument using the key file provided by the second argument
@@ -50,7 +51,7 @@ const encrypt =  function(plainText, privateKeyFile) {
   const encrypted = crypto.privateEncrypt(
     {
       key: privateKey,
-      passphrase: root.private_key,
+      passphrase: ky,
     },
     Buffer.from(plainText)
   );
@@ -70,7 +71,7 @@ const decrypt = function(encryptedText, privateKeyFile) {
   const decrypted = crypto.publicDecrypt(
     {
       key: privateKey,
-      passphrase: root.private_key,
+      passphrase: ky,
     },
     Buffer.from(encryptedText)
   );
@@ -86,7 +87,7 @@ const decrypt = function(encryptedText, privateKeyFile) {
  */
 const generateToken = function(id, token) {
   return jwt.sign({ id }, token, {
-    expiresIn: 15 * 60,
+    expiresIn: 60 * 60,
   });
 }
 

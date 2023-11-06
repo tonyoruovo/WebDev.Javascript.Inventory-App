@@ -1,4 +1,7 @@
 /* eslint-disable one-var */
+
+const { rootFolder } = require("../../repo/utility.cjs");
+
 /**
  * Error middleware for when route was not found. It instantiates an `Error` object with a `404 Not found` message,
  * attaches a `statusCode` field to it, assigns `404` to that field and calls `next(err)`
@@ -81,7 +84,7 @@ const handler = function (er, req, res, next) {
   if (er) {
     console.log("an error occured");
     console.log(er);
-    const c = require("../../../config.json");
+    const c = require(rootFolder() + "/config.json");
     if(c.inDev)
       res.status(er.statusCode ? er.statusCode : 500).json({
         message: er.message ?? "internal server error",

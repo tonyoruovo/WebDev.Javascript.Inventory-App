@@ -1,8 +1,7 @@
 
-const { Schema, model } = require("mongoose");
+const { Schema } = require("mongoose");
 const { Order } = require("./order.cjs");
 const { v } = require("../repo/utility.cjs");
-const { Employee } = require("./employee.cjs");
 const { Location } = require("./location.cjs");
 const { Amount } = require("./amount.cjs");
 
@@ -63,7 +62,7 @@ const transaction = {
         required: true,
         validate: {
             validator: async function(x) {
-                return v(await Employee.findById(x).exec());
+                return v(await require("./employee.cjs").Employee.findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists as an employee`;
@@ -115,8 +114,14 @@ const TransactionSchema = new Schema(transaction, {
  * The model for the transaction schema
  * @type {import("mongoose").Model<TransactionSchemaConfig>}
  */
-const Transaction = model("Transaction", TransactionSchema);
+// const Transaction = model("Transaction", TransactionSchema);
+/**
+ * Creates the `Transaction` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<TransactionSchemaConfig>} the `Transaction` model created from the specified connection.
+ */
+const create = c => c.model("Transaction", TransactionSchema);
 
 module.exports = {
-    TransactionSchema, Transaction
+    TransactionSchema, create
 }

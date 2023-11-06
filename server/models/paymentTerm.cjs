@@ -1,4 +1,4 @@
-const {Schema, model} = require("mongoose");
+const {Schema} = require("mongoose");
 const { Amount } = require("./amount.cjs");
 const { v } = require("../repo/utility.cjs");
 
@@ -133,9 +133,15 @@ const PaymentTermSchema = new Schema(paymentTerm, {
  * The model for the payment term
  * @type {import("mongoose").Model<PaymentTermSchemaConfig>}
  */
-const PaymentTerm = model("PaymentTerm", PaymentTermSchema);
+// const PaymentTerm = model("PaymentTerm", PaymentTermSchema);
+/**
+ * Creates the `PaymentTerm` model using the given connection.
+ * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @returns {import("mongoose").Model<PaymentTermSchemaConfig>} the `PaymentTerm` model created from the specified connection.
+ */
+const create = c => c.model("PaymentTerm", PaymentTermSchema);
 
 module.exports = {
-    PaymentTerm, PaymentTermSchema
+    create, PaymentTermSchema
 }
 
