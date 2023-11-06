@@ -69,7 +69,10 @@ const { v } = require("../repo/utility.cjs");
  * @type {ReportSchemaConfig}
  */
 const report = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _m: {
         type: Schema.Types.String,
         trim: true,

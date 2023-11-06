@@ -61,7 +61,10 @@ const { v } = require("../repo/utility.cjs");
  * @type {PaymentTermSchemaConfig}
  */
 const paymentTerm = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _prd: {
         type: Schema.Types.Number,
         min: 0,

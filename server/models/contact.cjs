@@ -33,7 +33,10 @@ const { Account } = require("./account.cjs");
  * @type {ContactSchemaConfig}
  */
 const contact = {
-    _id: mongoose.Schema.Types.ObjectId,
+    _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        unique: true
+    },
     _com_n: {
         type: mongoose.Schema.Types.String,
         unique: true,

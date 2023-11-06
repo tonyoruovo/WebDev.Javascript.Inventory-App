@@ -107,7 +107,10 @@ const { Schema, Types } = require("mongoose");
  * @type {RoleSchemaConfig}
  */
 const role = {
-    _id: Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _is: {
         type: Types.ObjectId,
         immutable: true,

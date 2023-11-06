@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
-const { Account } = require("../../models/account.cjs");
+const { create } = require("../../models/account.cjs");
 const { throws, nAuth } = require("./error.cjs");
 const { v, rootFolder } = require("../../repo/utility.cjs");
 
@@ -24,7 +24,9 @@ const auth = asyncHandler(
 		) {
 			try {
 				let t = req.headers.authorization.split(" ")[1];
+				req.cookies
 				const verified = jwt.verify(t, require(rootFolder() + "/config.json").jwt);
+				const Account = create(req.body.connection);
 				req.user = await Account.findById(verified.id).select("_id -_h");
 				if (!v(req.user) || !v(req.user._u)) nAuth(Error("Not Authourized"));
 				//   const c = await Contact.findOne({

@@ -54,7 +54,10 @@ const { Schema } = require("mongoose");
  * @type {AlertSchemaConfig}
  */
 const alert = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _t: {
         type: Schema.Types.String,
         required: true,

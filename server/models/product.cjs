@@ -33,7 +33,8 @@ const product = {
 	_id: {
 		type: Schema.Types.Buffer,
 		alias: "code",
-		required: true
+		required: true,
+		unique: true
 	},
 	_c: {
 		type: [Schema.Types.String],

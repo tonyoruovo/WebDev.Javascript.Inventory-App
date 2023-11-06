@@ -25,7 +25,10 @@ const { Account } = require("./account.cjs");
  * @type {SubjectSchemaConfig}
  */
 const subject = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _c: {
         type: Schema.Types.ObjectId,
         ref: "Contact",

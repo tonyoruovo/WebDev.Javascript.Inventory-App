@@ -25,7 +25,10 @@ const { Amount } = require("./amount.cjs");
  * @type {TransactionSchemaConfig}
  */
 const transaction = {
-    _id: Schema.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _ta: {
         type: [{
             type: Schema.Types.ObjectId,

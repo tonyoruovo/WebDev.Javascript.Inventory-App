@@ -1,5 +1,5 @@
 
-const {Schema, model} = require("mongoose");
+const {Schema} = require("mongoose");
 const { Subject } = require("./subject.cjs");
 const { v } = require("../repo/utility.cjs");
 
@@ -17,7 +17,10 @@ const { v } = require("../repo/utility.cjs");
  * @type {EmployeeSchemaConfig}
  */
 const employee = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     // _r: {
     //     type: [RoleSchema],
     //     alias: "roles"

@@ -14,7 +14,10 @@ const mongoose = require("mongoose");
  * @type {EmailSchemaConfig}
  */
 const email = {
-    _id: mongoose.Schema.Types.ObjectId,
+    _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        unique: true
+    },
     _e: {
         type: mongoose.Schema.Types.String,
         trim: true,

@@ -91,7 +91,10 @@ const { v } = require("../repo/utility.cjs");
  * @type {OrderSchemaConfig}
  */
 const order = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _s: {
         type: Schema.Types.ObjectId,
         ref: "Subject",

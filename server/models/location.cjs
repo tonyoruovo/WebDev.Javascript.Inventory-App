@@ -29,7 +29,9 @@ const unit = {
  * The instantiated `UnitSchema` object.
  * @type {Schema<UnitSchemaConfig>}
  */
-const UnitSchema = new Schema(unit);
+const UnitSchema = new Schema(unit, {
+    _id: false
+});
 /**
  * @typedef {Object} LocationSchemaConfig
  * @property {Schema.Types.ObjectId} _id The mongoose id for this location.
@@ -52,7 +54,10 @@ const UnitSchema = new Schema(unit);
  * @type {LocationSchemaConfig}
  */
 const location = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _c: {
         type: Schema.Types.ObjectId,
         ref: "Contact",

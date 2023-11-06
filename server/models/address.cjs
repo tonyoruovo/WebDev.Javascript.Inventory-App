@@ -28,7 +28,10 @@ const mongoose = require("mongoose");
  * @type {AddressSchemaConfig}
  */
 const address = {
-    _id: mongoose.Schema.Types.ObjectId,
+    _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        unique: true
+    },
     _s: {
         type: mongoose.Schema.Types.String,
         trim: true,

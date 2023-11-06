@@ -24,29 +24,31 @@ module.exports = () => {
     // mongoose.set("toJSON", { getters: true });
     mongoose.set("autoIndex", !c.inDev);
     mongoose.set("debug", c.inDev);
-    mog.robCon = mongoose.createConnection("mongodb://", {
-        auth: {
-            password: "qwerty#123()",
-            username: "maintenance"
-        },
-        authSource: "admin",
-        dbName: "inventory",
-        directConnection: true,
-        pass: "qwerty#123()",
-        user: "maintenance",
-        localPort: 27017,
-        servername: "127.0.0.1",
-        host: "127.0.0.1",
-        connectTimeoutMS: 40000
-    });
     setInterval(() => {
-        mog.robCon.model("Report").bulkSave([], {
-            dbName: "inventory",
-            authdb: "admin",
-            
-        })
-    }, )
-    mog.robCon.model("Report").findOne({})
+        const { add } = require("./data/report.cjs");
+        /**
+         * @type {import("./data/report.cjs").ReportDoc}
+         */
+        const r = {
+            connection : mongoose.createConnection("mongodb://maintenance:" + encodeURIComponent("qwerty#123()") + "@127.0.0.1:27017", {
+                auth: {
+                    password: "qwerty#123()",
+                    username: "maintenance"
+                },
+                authSource: "admin",
+                dbName: "inventory",
+                directConnection: true,
+                pass: "qwerty#123()",
+                user: "maintenance",
+                localPort: 27017,
+                servername: "127.0.0.1",
+                host: "127.0.0.1",
+                connectTimeoutMS: 40000
+            }),
+            msg: "Auto generated",
+
+        }
+    }, 86_400_000);//generates a report every 24 hours
 
     /**
      * @type {DbObject}
@@ -74,22 +76,22 @@ module.exports = () => {
         stream: createWriteStream(join(__dirname, 'access.log'), { flags: 'a' })
     }));
     app.use("/api/v1/account", auto(), require("./routes/account.cjs"));
-    app.use("/api/v1/address", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/address.cjs"));
-    app.use("/api/v1/alert", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/alert.cjs"));
-    app.use("/api/v1/amount", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/amount.cjs"));
+    app.use("/api/v1/address", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/address.cjs"));
+    app.use("/api/v1/alert", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/alert.cjs"));
+    app.use("/api/v1/amount", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/amount.cjs"));
     app.use("/api/v1/cmd", require("./routes/cmd.cjs"));
-    app.use("/api/v1/contact", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/contact.cjs"));
+    app.use("/api/v1/contact", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/contact.cjs"));
     app.use("/api/v1/email", auto(), require("./routes/email.cjs"));
-    app.use("/api/v1/employee", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/employee.cjs"));
-    app.use("/api/v1/location", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/location.cjs"));
-    app.use("/api/v1/name", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/name.cjs"));
-    app.use("/api/v1/order", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/order.cjs"));
-    app.use("/api/v1/paymentTerm", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/paymentTerm.cjs"));
-    app.use("/api/v1/phone", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/phone.cjs"));
-    app.use("/api/v1/product", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/product.cjs"));
-    app.use("/api/v1/report", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/report.cjs"));
-    app.use("/api/v1/subject", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/subject.cjs"));
-    app.use("/api/v1/transaction", require("./controllers/middlewares/dbInit.cjs")(mog), require("./routes/transaction.cjs"));
+    app.use("/api/v1/employee", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/employee.cjs"));
+    app.use("/api/v1/location", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/location.cjs"));
+    app.use("/api/v1/name", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/name.cjs"));
+    app.use("/api/v1/order", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/order.cjs"));
+    app.use("/api/v1/paymentTerm", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/paymentTerm.cjs"));
+    app.use("/api/v1/phone", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/phone.cjs"));
+    app.use("/api/v1/product", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/product.cjs"));
+    app.use("/api/v1/report", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/report.cjs"));
+    app.use("/api/v1/subject", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/subject.cjs"));
+    app.use("/api/v1/transaction", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/transaction.cjs"));
     app.use(e404);
     app.use(handler)
     

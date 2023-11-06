@@ -20,10 +20,14 @@ const { Email } = require("./email.cjs");
  * @type {AccountSchemaConfig}
  */
 const account = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _e: {
         type: [{
             type: Schema.Types.ObjectId,
+            unique: true,
             ref: "Email",
             required: true,
             validate: {

@@ -18,7 +18,7 @@ const init = function () {
 				rq.body.connStr = { uri, options };
 				console.log({ connStr: rq.body.connStr });
 				console.log("connecting: ");
-				const c = mongoose.createConnection(uri, options);
+				const c = await mongoose.createConnection(uri, options).asPromise();
 				console.log("connected");
 				rq.body.connection = c.connection.useDb(rq.body.connStr.dbName ?? "inventory");
 			}

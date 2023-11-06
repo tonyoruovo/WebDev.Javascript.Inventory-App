@@ -26,7 +26,10 @@ const { Schema } = require("mongoose");
  * @type {AmountSchemaConfig}
  */
 const amount = {
-    _id: Schema.Types.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     _v: {
         type: Schema.Types.String,
         required: true,

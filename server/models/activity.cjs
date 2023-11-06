@@ -29,7 +29,10 @@ const { Schema } = require("mongoose");
  * @type {ActivitySchemaConfig}
  */
 const activity = {
-    _id: Schema.ObjectId,
+    _id: {
+        type: Schema.Types.ObjectId,
+        unique: true
+    },
     a: {
         type: Schema.Types.String,
         enum: ["create", "read", "update", "delete", "grant", "revoke"],

@@ -11,7 +11,7 @@ module.exports = {
 			)}@127.0.0.1:27017/?directConnection=true&connectTimeoutMS=40000&authSource=admin&appName=inventory-server.js`;
 			// m.con = await mongoose.connect(uri, { dbName: "inventory" });
 			if(mongoose.connections.length === 0)
-				rq.body.connection = mongoose.createConnection(uri);
+				rq.body.connection = await mongoose.createConnection(uri).asPromise();
 			else rq.body.connection = mongoose.connections[0];
 			n();
 		});

@@ -37,7 +37,10 @@ const mongoose = require("mongoose");
  * @type {PhoneSchemaConfig}
  */
 const phone = {
-    _id: mongoose.Schema.Types.ObjectId,
+    _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        unique: true
+    },
     _n: {
         type: mongoose.Schema.Types.String,
         unique: true,

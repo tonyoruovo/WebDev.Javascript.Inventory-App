@@ -142,6 +142,22 @@ const mod = async p => {
     const Report = create(p.connection);
     return await Report.findByIdAndUpdate(p.id, p.query);
 };
+/**
+ * @typedef {Object} SalesReportParam Paramaters for generating a report
+ * @property {Date} from the start date for the report
+ * @property {Date} to the end date for the report
+ * @property {ReportDoc} body the body of the report.
+ * @property {import("mongoose").Connection} connection the connection that will be used to create `Transaction`, `Subject`
+ * and other relevant models.
+ */
+/**
+ * 
+ * @param {SalesReportParam} p the options for generating the report
+ */
+// const genRep = async p => {
+//     const { create } = require("../models/transaction.cjs");
+//     const Transaction = create(p.connection);
+// }
 
 module.exports = {
     add, mod, rem, ret
