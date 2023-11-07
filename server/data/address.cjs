@@ -17,7 +17,7 @@ const { create } = require("../models/address.cjs");
  * @property {string} street the street name and number
  * @property {string} [l] alias for {@linkcode AddressDoc.landmark}
  * @property {string} [landmark] any known landmark that aids in the locating the given street.
- * @property {string} [c] alias for {@linkcode AddressDoc.city}
+ * @property {string} [cy] alias for {@linkcode AddressDoc.city}
  * @property {string} [city] the city in which the given street is located.
  * @property {string} [z] alias for {@linkcode AddressDoc.zip}
  * @property {string} [zip] the zip code of the given street.
@@ -44,13 +44,15 @@ const add = async p => {
         _id: new Types.ObjectId(),
         _s: p.s || p.street,
         _l: p.l || p.landmark,
-        _c: p.c || p.city,
+        _c: p.cy || p.city,
         _z: p.z || p.zip,
         _lg: p.lg || p.lga,
         _com: p.msg,
         _st: p.st || p.state,
         _cc: p.cc || p.cCode || "234"
     }).save())._id);
+
+    p.connection.close();
 
     return _;
 }
@@ -83,9 +85,11 @@ const bulkAdd = async p => {
 const ret = async p => {
 	const Address = create(p.connection);
     if(Array.isArray(p)) return await bulkRet(p);
-    return await Address.findOne(p)
+    const r = await Address.findOne(p)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
+    p.connection.close();
+    return r;
 }
 /**
  * Retrieves the details of the given address using the array of queries to execute for each of the item to get.
@@ -118,7 +122,9 @@ const bulkRet = async p => {
 const rem = async p => {
 	const Address = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Address.findByIdAndDelete(p.id).exec();
+	const r = await Address.findByIdAndDelete(p.id).exec();
+    p.connection.close();
+    return r;
 };
 
 /**
@@ -149,7 +155,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
 	const Address = create(p.connection);
-    return await Address.findByIdAndUpdate(p.id, p.query);
+    const r = await Address.findByIdAndUpdate(p.id, p.query);
+    p.connection.close();
+    return r;
 };
 
 module.exports = {

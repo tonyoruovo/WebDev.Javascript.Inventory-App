@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const {Phone} = require("./phone.cjs");
-const {Address} = require("./address.cjs");
-const { Name } = require("./name.cjs");
+const phone = require("./phone.cjs");
+const address = require("./address.cjs");
+// const name = require("./name.cjs");
 const { v } = require("../repo/utility.cjs");
-const { Account } = require("./account.cjs");
+const account = require("./account.cjs");
 
 /**
  * A record of key values containing mongoose configurations for the `ContactSchema`.
@@ -51,15 +51,7 @@ const contact = {
         alias: "name",
         required: [function() {
             return this._com_n === null || this._com_n === undefined;
-        }, "'name' and 'companyName' cannot both be empty"],
-        validate: {
-            validator: async function(x) {
-                return v(await Name.findById(x).exec());
-            },
-            message: function(x) {
-                return `${x} does not exists as a name`;
-            }
-        }
+        }, "'name' and 'companyName' cannot both be empty"]
     },
     _a: {
         type: [{
@@ -67,7 +59,7 @@ const contact = {
             ref: "Address",
             validate: {
                 validator: async function(x) {
-                    return v(await Address.findById(x).exec());
+                    return v(await address.create().findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists in address`;
@@ -85,7 +77,7 @@ const contact = {
         required: true,
         validate: {
             validator: async function(x) {
-                return v(await Account.findById(x).exec());
+                return v(await account.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists`;
@@ -114,7 +106,7 @@ const contact = {
             ref: "Phone",
             validate: {
                 validator: async function(x) {
-                    return v(await Phone.findById(x).exec());
+                    return v(await phone.create().findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists`;
@@ -168,9 +160,9 @@ const ContactSchema = new mongoose.Schema(contact, {
 // const Contact = mongoose.model("Contact", ContactSchema);
 /**
  * Creates the `Contact` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<ContactSchemaConfig>} the `Contact` model created from the specified connection.
  */
-const create = c => c.model("Contact", ContactSchema);
+const create = (c = mongoose.connections[0]) => c.model("Contact", ContactSchema);
 
 module.exports = {ContactSchema, create};

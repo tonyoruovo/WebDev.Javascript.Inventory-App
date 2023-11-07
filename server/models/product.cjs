@@ -1,7 +1,7 @@
 const { v } = require("../repo/utility.cjs");
-const { Schema } = require("mongoose");
-const { Subject } = require("./subject.cjs");
-const { Amount } = require("./amount.cjs");
+const { Schema, default: mongoose } = require("mongoose");
+const subject = require("./subject.cjs");
+const amount = require("./amount.cjs");
 
 /**
  * Product models are meant to be immutable, hence whenever a price is changed, the old `Product` model
@@ -81,7 +81,7 @@ const product = {
 		required: true,
         validate: {
             validator: async function(x) {
-                return v(await Amount.findById(x).exec());
+                return v(await amount.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists as an amount`;
@@ -121,7 +121,7 @@ const product = {
 		alias: "supplier",
         validate: {
             validator: async function(x) {
-                return v(await Subject.findById(x).exec());
+                return v(await subject.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists`;
@@ -158,10 +158,10 @@ const ProductSchema = new Schema(product, {
 // const Product = model("Product", ProductSchema);
 /**
  * Creates the `Product` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<ProductSchemaConfig>} the `Product` model created from the specified connection.
  */
-const create = c => c.model("Product", ProductSchema);
+const create = (c = mongoose.connections[0]) => c.model("Product", ProductSchema);
 
 module.exports = {
 	ProductSchema,

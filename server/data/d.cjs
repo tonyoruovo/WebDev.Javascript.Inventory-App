@@ -569,7 +569,7 @@
  * @property {number} [bucketRoundingSeconds]
  */
 /**
- * @typedef {MongooseSchemaOptions & import("mongoose").SchemaOptions & import("mongoose").SchemaTypeOptions<T, D>} Options
+ * @typedef {import("mongoose").SchemaOptions & import("mongoose").SchemaTypeOptions<T, D> & MongooseSchemaOptions} Options
  * @template T the mongoose type assigned to the "type" property
  * @template D the document type.
  */

@@ -9,6 +9,7 @@ const { v } = require("../repo/utility.cjs");
  * @property {Types.ObjectId[]} addresses references to addresses within the `Address` collection.
  * @property {Types.ObjectId[]} phones references to phones within the `Phone` collection.
  * @property {Types.ObjectId} account a reference to the account within the `Account` collection.
+ * @property {import("../models/name.cjs").NameDoc} name the id of the name of this contact within the `Name` collection.
  */
 /**
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total contact.
@@ -18,8 +19,8 @@ const { v } = require("../repo/utility.cjs");
  * @property {string} [cn] alias for {@linkcode ContactDoc.companyName}
  * @property {string} [companyName] the name of the company that own this contact
  * @property {string} [msg] any relevant messsage for this contact
- * @property {string} [n] alias for {@linkcode ContactDoc.name}
- * @property {string} [name] {@linkcode Types.ObjectId} as a string representing the fullname of the owner of this contact.
+ * @property {import("../models/name.cjs").NameDoc} [n] alias for {@linkcode ContactDoc.name}
+ * @property {import("../models/name.cjs").NameDoc} [name] the name representing the fullname of the owner of this contact.
  * @property {string} [a] alias for {@linkcode ContactDoc.address}
  * @property {string} [address] {@linkcode Types.ObjectId} as a string representing the address of this contact.
  * @property {string[]} [as] alias for {@linkcode ContactDoc.address}
@@ -66,22 +67,30 @@ const add = async p => {
     _.account = new Types.ObjectId(p.ac || p.account);
 
 	const Contact = create(p.connection);
+	const Name = require("../models/name.cjs").create(p.connection);
+
+	const n = await Name.findById(p.n || p.name).exec();
+
+	if(v(n)) _.name = n;
+	else _.name = (await new Name(p.n || p.name).save())._id;
 
 	_.contact = (
 		await new Contact({
 			_id: new Types.ObjectId(),
 			_com_n: p.cn || p.companyName,
-			_n: p.n || p.name,
+			_n: _.name,
 			_a: _.addresses,
             _ac: _.account,
             _nt: p.msg,
             _p: _.phones,
-            _pm: p.pm || p.preferredMethod,
+            _pm: p.pm || p.preferredMethod || "sms",
             _pp: v(p.pp || p.profilePicture) ? [(p.pp || p.profilePicture)] : ((p.pps || p.profilePictures)),
             _s: v(p.s || p.social) ? [(p.s || p.social)] : ((p.ss || p.socials)),
             _w: v(p.w || p.website) ? [(p.w || p.website)] : ((p.ws || p.websites)),
 		}).save()
 	)._id;
+
+	p.connection.close();
 
 	return _;
 };
@@ -113,7 +122,9 @@ const bulkAdd = async p => {
 const ret = async p => {
 	const Contact = create(p.connection);
 	if (Array.isArray(p.query)) return await bulkRet(p.query);
-	return await Contact.findOne(p.query).select("-_id -_cAt -_uAt -_vk").exec();
+	const r = await Contact.findOne(p.query).select("-_id -_cAt -_uAt -_vk").exec();
+	p.connection.close();
+	return r;
 };
 /**
  * Retrieves the details of the given contact using the array of queries to execute for each of the item to get.
@@ -145,7 +156,9 @@ const bulkRet = async p => {
 const rem = async p => {
 	const Contact = create(p.connection)
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Contact.findByIdAndDelete(p.id).exec();
+	const r = await Contact.findByIdAndDelete(p.id).exec();
+	p.connection.close();
+	return r;
 };
 
 /**
@@ -176,7 +189,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
 	const Contact = create(p.connection);
-	return await Contact.findByIdAndUpdate(p.id, p.query);
+	const r = await Contact.findByIdAndUpdate(p.id, p.query);
+	p.connection.close();
+	return r;
 };
 
 module.exports = {

@@ -39,6 +39,8 @@ const add = async p => {
 		}).save()
 	)._id;
 
+	p.connection.close();
+
 	return _;
 };
 /**

@@ -1,6 +1,8 @@
 /* eslint-disable one-var */
 
+const asyncHandler = require("express-async-handler");
 const { rootFolder } = require("../../repo/utility.cjs");
+const { default: mongoose } = require("mongoose");
 
 /**
  * Error middleware for when route was not found. It instantiates an `Error` object with a `404 Not found` message,
@@ -80,11 +82,12 @@ const nAuth = function (err) {
  * Default error handler that properly assigns the response status as well as the stack message for debugging
  * @type {import("express").ErrorRequestHandler}
  */
-const handler = function (er, req, res, next) {
+const handler = asyncHandler(async function (er, req, res, next) {
   if (er) {
     console.log("an error occured");
     console.log(er);
     const c = require(rootFolder() + "/config.json");
+    mongoose.connections.forEach(async c => await c.close(true));
     if(c.inDev)
       res.status(er.statusCode ? er.statusCode : 500).json({
         message: er.message ?? "internal server error",
@@ -93,7 +96,7 @@ const handler = function (er, req, res, next) {
     else res.status(er.statusCode ? er.statusCode : 500);
   }
   return next();
-};
+});
 
 module.exports = {
   e400,

@@ -60,11 +60,13 @@ const add = async p => {
 			_pid: p.pid,
 			_rt: p.rt,
 			_u: p.u || p.username,
-			_e: _.email
+			_e: [_.email]
 		}).save()
 	)._id;
 
 	_.tkn = generateToken(_.account, require(rootFolder() + "/config.json").jwt);
+
+	p.connection.close();
 
 	return _;
 };
@@ -95,7 +97,7 @@ const bulkAdd = async p => {
 const ret = async p => {
 	const Account = create(p.connection);
 	if (Array.isArray(p.query)) return await bulkRet(p.query);
-	return await Account.findOne(p.query).select("_id -_cAt -_uAt -_vk").exec();
+	return await Account.findOne(p.query).select("_id -_h -_cAt -_uAt -_vk").exec();
 };
 /**
  * Retrieves the details of the given account using the array of queries to execute for each of the item to get.
@@ -166,6 +168,7 @@ const mod = async p => {
  */
 const login = async p => {
 	const Account = create(p.connection);
+	// console.log(p);
 	let u = p.u || p.username;
 	const pw = p.pw || p.password || p.unhashed;
 	if (!v(u)) throw Error("username is missing");

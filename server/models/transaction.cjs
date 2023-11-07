@@ -1,9 +1,9 @@
 
-const { Schema } = require("mongoose");
-const { Order } = require("./order.cjs");
+const { Schema, default: mongoose } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
-const { Location } = require("./location.cjs");
-const { Amount } = require("./amount.cjs");
+const order = require("./order.cjs");
+const location = require("./location.cjs");
+const amount = require("./amount.cjs");
 
 /**
  * Transaction models are meant to be for a single order.
@@ -35,7 +35,7 @@ const transaction = {
             ref: "Amount",
             validate: {
                 validator: async function(x) {
-                    return v(await Amount.findById(x).exec());
+                    return v(await amount.create().findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists as an amount`;
@@ -51,7 +51,7 @@ const transaction = {
         required: true,
         validate: {
             validator: async function(x) {
-                return v(await Location.findById(x).exec());
+                return v(await location.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists as a location`;
@@ -65,7 +65,7 @@ const transaction = {
         required: true,
         validate: {
             validator: async function(x) {
-                return v(await require("./employee.cjs").Employee.findById(x).exec());
+                return v(await require("./employee.cjs").employee.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists as an employee`;
@@ -79,7 +79,7 @@ const transaction = {
         required: true,
         validate: {
             validator: async function(x) {
-                return v(await Order.findById(x).exec());
+                return v(await order.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists as an order`;
@@ -120,10 +120,10 @@ const TransactionSchema = new Schema(transaction, {
 // const Transaction = model("Transaction", TransactionSchema);
 /**
  * Creates the `Transaction` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<TransactionSchemaConfig>} the `Transaction` model created from the specified connection.
  */
-const create = c => c.model("Transaction", TransactionSchema);
+const create = (c = mongoose.connections[0]) => c.model("Transaction", TransactionSchema);
 
 module.exports = {
     TransactionSchema, create

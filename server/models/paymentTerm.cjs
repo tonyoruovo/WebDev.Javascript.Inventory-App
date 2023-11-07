@@ -1,5 +1,5 @@
-const {Schema} = require("mongoose");
-const { Amount } = require("./amount.cjs");
+const {Schema, default: mongoose} = require("mongoose");
+const amount = require("./amount.cjs");
 const { v } = require("../repo/utility.cjs");
 
 /**
@@ -89,7 +89,7 @@ const paymentTerm = {
             ref: "Amount",
             validate: {
                 validator: async function(x) {
-                    return v(await Amount.findById(x).exec());
+                    return v(await amount.create().findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists as an amount`;
@@ -139,10 +139,10 @@ const PaymentTermSchema = new Schema(paymentTerm, {
 // const PaymentTerm = model("PaymentTerm", PaymentTermSchema);
 /**
  * Creates the `PaymentTerm` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<PaymentTermSchemaConfig>} the `PaymentTerm` model created from the specified connection.
  */
-const create = c => c.model("PaymentTerm", PaymentTermSchema);
+const create = (c = mongoose.connections[0]) => c.model("PaymentTerm", PaymentTermSchema);
 
 module.exports = {
     create, PaymentTermSchema

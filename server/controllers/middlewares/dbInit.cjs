@@ -1,27 +1,23 @@
 const { default: mongoose } = require("mongoose");
 const asyncHandler = require("express-async-handler");
+const { mop } = require("../../repo/mop.cjs");
+const { v } = require("../../repo/utility.cjs");
 // const { v } = require("../../repo/utility.cjs");
 /**
  * Constructs a middleware that initialises the database by connecting this user if they are not connected.
+ * @type {import("../middlewares/d.cjs").Middleware<unknown, {connection: import("mongoose").Connection}, unknown, unknown>}
  */
 const init = function () {
-	return /** @type {import("./d.cjs").Middleware} */ asyncHandler(
+	return asyncHandler(
 		async function (rq, rs, n) {
-			if (mongoose.connections.length === 0) {
-				const uri = `mongodb://${encodeURIComponent(
-					rq.body.connStr.user
-				)}:${encodeURIComponent(rq.body.connStr.pass)}@127.0.0.1:27017`;
-				const options = {
-					dbName: rq.body.connStr.dbName ?? "inventory",
-					serverApi: { version: rq.body.connStr.ver ?? "1" }
-				};
-				rq.body.connStr = { uri, options };
-				console.log({ connStr: rq.body.connStr });
-				console.log("connecting: ");
-				const c = await mongoose.createConnection(uri, options).asPromise();
-				console.log("connected");
-				rq.body.connection = c.connection.useDb(rq.body.connStr.dbName ?? "inventory");
-			}
+			const uri = `mongodb://127.0.0.1:27017`;
+			if(!v(rq.body.c)) throw Error("No connection params");
+			const o = mop({...rq.body.c});
+			rq.body.connection = await mongoose.createConnection().openUri(uri, o);
+			// if (mongoose.connections.length === 0) {
+			// } else {
+			// 	rq.body.connection = await mongoose.connections[0].openUri(uri, o);
+			// }
 			// rq.body.dbsession = m;
 			n();
 		}

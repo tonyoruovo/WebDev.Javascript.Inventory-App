@@ -102,10 +102,10 @@ const PhoneSchema = new mongoose.Schema(phone, {
 // const Phone = mongoose.model("Phone", PhoneSchema);
 /**
  * Creates the `Phone` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<PhoneSchemaConfig>} the `Phone` model created from the specified connection.
  */
-const create = c => c.model("Phone", PhoneSchema);
+const create = (c = mongoose.connections[0]) => c.model("Phone", PhoneSchema);
 
 module.exports = {
     PhoneSchema, create

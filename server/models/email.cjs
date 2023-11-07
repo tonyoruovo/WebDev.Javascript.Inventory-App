@@ -66,9 +66,9 @@ const EmailSchema = new mongoose.Schema(email, {
 // const Email = mongoose.model("Email", EmailSchema);
 /**
  * Creates the `Email` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<EmailSchemaConfig>} the `Email` model created from the specified connection.
  */
-const create = c => c.model("Email", EmailSchema);
+const create = (c = mongoose.connections[0]) => c.model("Email", EmailSchema);
 
 module.exports = {EmailSchema, create};

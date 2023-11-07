@@ -1,6 +1,7 @@
 const {log, error} = require("console");
 const err = error;
 const mongoose = require("mongoose");
+const { mop } = require("../repo/mop.cjs");
 /* Please use mongoose transactions for saving complex/composite documents. see https://mongoosejs.com/docs/transactions.html */
 /**
  * @typedef {import("mongoose")} Mongoose
@@ -45,11 +46,16 @@ const mongoose = require("mongoose");
  * running in the windows service or it has not being started in the `mongosh`). This may be
  * solved by manually starting the mongodb from the mongo shell (`mongosh`) using
  * ```powershell
- * mongod --dbpath C:\MongoDB\Server\6.0\data
+ * mongod --dbpath C:\MongoDB\Server\6.0\data --port 27017 --auth --bind_ip 127.0.0.1
  * ```
  * and then leave that window open as long as the connection is needed
  * or go to `Services.msc > MongoDB Server (MongoDB) > properties > start`.\
- * The mongodb instance can also be started using the .NET service API for powershell. The name of the service is `MongoDB`.
+ * The mongodb instance can also be started using the .NET service API for powershell. The name of the service is `MongoDB`.\
+ * \
+ * To access mongosh do:
+ * ```powershell
+ * mongosh --host 127.0.0.1 -u maintenance -p qwerty#123() --port 27017 --authenticationDatabase admin inventory
+ * ```
  */
 const connect = async function(connStr) {
     log("called conn on " + __filename);
@@ -227,6 +233,23 @@ const dropAll = async function(p) {
         throw e;
     }
 };
+const createRole = async function(p) {
+    try {
+        let x = await mongoose.connection.db.command({
+            role: p.role,
+            privileges: p.privileges,
+            roles: p.roles,
+            authenticationRestrictions: p.authenticationRestrictions,
+        });
+        setImmediate(() => {
+            log("Create roles successful");
+        });
+        return x;
+    } catch (e) {
+        err(e);
+        throw e;
+    }
+};
 const grantRoles = async function(p) {
     try {
         let x = await mongoose.connection.db.command({
@@ -391,12 +414,14 @@ const listCommands = async function(p) {
  * Parameter object for issuing commands to the database.
  * @typedef {Object} CmdParam
  * @property {Record<string, any>} cmd the command to issued
- * @property {Object} connStr Contains the neccessary values for connecting to a database.
- * @property {string} connStr.uri the URI i.e the connection string
- * @property {Object} connStr.options any extra options used during the connection
- * @property {string} connStr.options.dbName the database name
- * @property {Object} connStr.options.serverApi the server api object
- * @property {string} connStr.options.serverApi.version the version of the server api
+ * @property {string} db the database on which this command is to be performed.
+ * @property {boolean} [f=false] forces the connection to close. This will only be used if the command itself was executed successfully.
+ * @property {import("../repo/mop.cjs").MopParam} c Contains the neccessary values for connecting to a database, which will include:
+ * - the URI i.e the connection string
+ * - any extra options used during the connection which must include:
+ * - the database name
+ * - the server api object
+ * - the version of the server api
  */
 /**
  * Runs a low-level command. Please see the [database command list](https://www.mongodb.com/docs/v7.0/reference/command/)
@@ -429,16 +454,19 @@ const listCommands = async function(p) {
  * locations that it was inserted in at step 2.
  * 
  * Now we have resetted the db. 
- * @param {CmdParam} param The db command to be run
+ * @param {CmdParam} p Parameter containing the db command to be run
  * @return {Promise<Record<string, any>>} a promise object with the results.
  */
-const run = async function(param) {
+const run = async function(p) {
     try{
-        log(param);
-        return (await (await mongoose.connect(param.connStr.uri, param.connStr.options))
-        .connection.useDb("admin", {
-            useCache: true
-        }).db.admin().command(param.cmd));
+        log(p);
+        const uri = `mongodb://127.0.0.1:27017`;
+        const o = mop({...p.c});
+        const c = await mongoose.createConnection().openUri(uri, o);
+        const r = await c.useDb(p.db, { useCache: true }).db.admin().command(p.cmd);
+        c.close(p.f || false);
+        // c.destroy(p.f || false);
+        return r;
     } catch(e){
         throw e;
     }

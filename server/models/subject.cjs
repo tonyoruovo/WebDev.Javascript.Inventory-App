@@ -1,10 +1,10 @@
 
-const { Schema } = require("mongoose");
+const { Schema, default: mongoose } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
-const { Contact } = require("./contact.cjs");
-const { PaymentTerm } = require("./paymentTerm.cjs");
-const { Transaction } = require("./transaction.cjs");
-const { Account } = require("./account.cjs");
+const contact = require("./contact.cjs");
+const paymentterm = require("./paymentTerm.cjs");
+const transaction = require("./transaction.cjs");
+const account = require("./account.cjs");
 
 /**
  * The subject of a transaction such as a customer, supplier, transfer agent (employee effecting the transfer)
@@ -34,7 +34,7 @@ const subject = {
         ref: "Contact",
         validate: {
             validator: async function(x) {
-                return v(await Contact.findById(x).exec());
+                return v(await contact.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists`;
@@ -47,7 +47,7 @@ const subject = {
             ref: "PaymentTerm",
             validate: {
                 validator: async function(x) {
-                    return v(await PaymentTerm.findById(x).exec());
+                    return v(await paymentterm.create().findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists`;
@@ -62,7 +62,7 @@ const subject = {
             ref: "Transaction",
             validate: {
                 validator: async function(x) {
-                    return v(await Transaction.findById(x).exec());
+                    return v(await transaction.create().findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists`;
@@ -90,7 +90,7 @@ const subject = {
         alias: "account",
         validate: {
             validator: async function(x) {
-                return v(await Account.findById(x).exec());
+                return v(await account.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists`;
@@ -127,10 +127,10 @@ const SubjectSchema = new Schema(subject, {
 // const Subject = model("Subject", SubjectSchema);
 /**
  * Creates the `Subject` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<SubjectSchemaConfig>} the `Subject` model created from the specified connection.
  */
-const create = c => c.model("Subject", SubjectSchema);
+const create = (c = mongoose.connections[0]) => c.model("Subject", SubjectSchema);
 
 module.exports = {
     create, SubjectSchema

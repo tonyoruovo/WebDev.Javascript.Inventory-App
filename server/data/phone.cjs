@@ -47,6 +47,8 @@ const add = async p => {
             _t: p.type || "mobile"
 		}).save()
 	)._id;
+	
+	p.connection.close();
 
 	return _;
 };
@@ -78,7 +80,9 @@ const bulkAdd = async p => {
 const ret = async p => {
 	const Phone = create(p.connection)
 	if (Array.isArray(p.query)) return await bulkRet(p.query);
-	return await Phone.findOne(p.query).select("-_id -_cAt -_uAt -_vk").exec();
+	const r = await Phone.findOne(p.query).select("-_id -_cAt -_uAt -_vk").exec();
+	p.connection.close();
+	return r;
 };
 /**
  * Retrieves the details of the given phone using the array of queries to execute for each of the item to get.
@@ -110,7 +114,9 @@ const bulkRet = async p => {
 const rem = async p => {
 	const Phone = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Phone.findByIdAndDelete(p.id).exec();
+	const r = await Phone.findByIdAndDelete(p.id).exec();
+	p.connection.close();
+	return r;
 };
 
 /**
@@ -141,7 +147,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
 	const Phone = create(p.connection);
-	return await Phone.findByIdAndUpdate(p.id, p.query);
+	const r = await Phone.findByIdAndUpdate(p.id, p.query);
+	p.connection.close();
+	return r;
 };
 
 module.exports = {

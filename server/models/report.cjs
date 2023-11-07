@@ -1,5 +1,5 @@
 
-const { Schema } = require("mongoose");
+const { Schema, default: mongoose } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
 
 /**
@@ -130,10 +130,10 @@ const ReportSchema = new Schema(report, {
 // const Report = model("Report", ReportSchema);
 /**
  * Creates the `Report` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<ReportSchemaConfig>} the `Report` model created from the specified connection.
  */
-const create = c => c.model("Report", ReportSchema);
+const create = (c = mongoose.connections[0]) => c.model("Report", ReportSchema);
 
 module.exports = {
     create, ReportSchema

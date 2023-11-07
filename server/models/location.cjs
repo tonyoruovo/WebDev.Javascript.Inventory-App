@@ -1,7 +1,7 @@
-const { Schema } = require("mongoose");
+const { Schema, default: mongoose } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
-const { PaymentTerm } = require("./paymentTerm.cjs");
-const { Contact } = require("./contact.cjs");
+const paymentTerm = require("./paymentTerm.cjs");
+const contact = require("./contact.cjs");
 /**
  * @typedef {Object} UnitSchemaConfig
  * @property {Schema.Types.ObjectId} _id
@@ -12,25 +12,25 @@ const { Contact } = require("./contact.cjs");
  * @type {UnitSchemaConfig}
  */
 const unit = {
-    _v: {
-        type: Schema.Types.Number,
-        min: 0,
-        required: true,
-        alias: "value"
-    },
-    _u: {
-        type: Schema.Types.String,
-        required: true,
-        alias: "unit",
-        lowercase: true
-    }
-}
+	_v: {
+		type: Schema.Types.Number,
+		min: 0,
+		required: true,
+		alias: "value"
+	},
+	_u: {
+		type: Schema.Types.String,
+		required: true,
+		alias: "unit",
+		lowercase: true
+	}
+};
 /**
  * The instantiated `UnitSchema` object.
  * @type {Schema<UnitSchemaConfig>}
  */
 const UnitSchema = new Schema(unit, {
-    _id: false
+	_id: false
 });
 /**
  * @typedef {Object} LocationSchemaConfig
@@ -54,62 +54,74 @@ const UnitSchema = new Schema(unit, {
  * @type {LocationSchemaConfig}
  */
 const location = {
-    _id: {
-        type: Schema.Types.ObjectId,
-        unique: true
-    },
-    _c: {
-        type: Schema.Types.ObjectId,
-        ref: "Contact",
-        required: true,
-        validate: {
-            validator: async function(x) {
-                return v(await Contact.findById(x).exec());
-            },
-            message: function(x) {
-                return `${x} does not exists as an amount`;
-            }
-        }
-    },
-    _cp: {
-        type: UnitSchema,
-        alias: "capacity",
-        required: true
-    },
-    _pt: {
-        type: [{
-            type: Schema.Types.ObjectId,
-            ref: "PaymentTerm",
-            validate: {
-                validator: async function(x) {
-                    return v(await PaymentTerm.findById(x).exec());
-                },
-                message: function(x) {
-                    return `${x} does not exists as an amount`;
-                }
-            }
-        }],
-        alias: "paymentTerms"
-    },
-    _s: {
-        type: Schema.Types.Buffer,
-        alias: "signature"
-    },
-    _pc: {
-        type: [Schema.Types.String],
-        alias: "pics"
-    },
-    _ds: {
-        type: Schema.Types.String,
-        alias: "defaultStatus",
-        enum: ["pending", "recieved", "canceled", "shipped", "approved", "in-progress", "completed", "failed", 'other'],
-        default: "other"
-    },
-    _d: {
-        type: Schema.Types.String,
-        alias: "description",
-    }
-}
+	_id: {
+		type: Schema.Types.ObjectId,
+		unique: true
+	},
+	_c: {
+		type: Schema.Types.ObjectId,
+		ref: "Contact",
+		required: true,
+		validate: {
+			validator: async function (x) {
+				return v(await contact.create().findById(x).exec());
+			},
+			message: function (x) {
+				return `${x} does not exists as an amount`;
+			}
+		}
+	},
+	_cp: {
+		type: UnitSchema,
+		alias: "capacity",
+		required: true
+	},
+	_pt: {
+		type: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "PaymentTerm",
+				validate: {
+					validator: async function (x) {
+						return v(await paymentTerm.create().findById(x).exec());
+					},
+					message: function (x) {
+						return `${x} does not exists as an amount`;
+					}
+				}
+			}
+		],
+		alias: "paymentTerms"
+	},
+	_s: {
+		type: Schema.Types.Buffer,
+		alias: "signature"
+	},
+	_pc: {
+		type: [Schema.Types.String],
+		alias: "pics"
+	},
+	_ds: {
+		type: Schema.Types.String,
+		alias: "defaultStatus",
+		enum: [
+			"pending",
+			"recieved",
+			"canceled",
+			"shipped",
+			"approved",
+			"in-progress",
+			"completed",
+			"failed",
+			"other"
+		],
+		default: "other"
+	},
+	_d: {
+		type: Schema.Types.String,
+		alias: "description"
+	}
+};
 /**
  * uses the following for the second argument:
  * ```json
@@ -124,11 +136,11 @@ const location = {
  * @type {Schema<LocationSchemaConfig>}
  */
 const LocationSchema = new Schema(location, {
-    timestamps: {
-        createdAt: "_cAt",
-        updatedAt: "_uAt"
-    },
-    versionKey: "_vk"
+	timestamps: {
+		createdAt: "_cAt",
+		updatedAt: "_uAt"
+	},
+	versionKey: "_vk"
 });
 // LocationSchema.plugin(() => )
 /**
@@ -138,11 +150,12 @@ const LocationSchema = new Schema(location, {
 // const Location = model("Location", LocationSchema);
 /**
  * Creates the `Location` (or `Unit`) model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
- * @param {boolean} l use location model? if yes then `Location` model will be returned, else a `Unit` model is returned.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
+ * @param {boolean} [l] use location model? if yes then `Location` model will be returned, else a `Unit` model is returned.
  * @returns {import("mongoose").Model<LocationSchemaConfig | UnitSchemaConfig>} the `Location` (or `Unit`) model created from the specified connection.
  */
-const create = (c,l = true) => l ? c.model("Location", LocationSchema) : c.model("Unit",UnitSchema);
+const create = (c = mongoose.connections[0], l = true) =>
+	l ? c.model("Location", LocationSchema) : c.model("Unit", UnitSchema);
 /**
  * The model for the unit
  * @type {import("mongoose").Model<UnitSchemaConfig>}
@@ -150,5 +163,7 @@ const create = (c,l = true) => l ? c.model("Location", LocationSchema) : c.model
 // const Unit = model("Unit", UnitSchema);
 
 module.exports = {
-    create, LocationSchema, UnitSchema
-}
+	create,
+	LocationSchema,
+	UnitSchema
+};

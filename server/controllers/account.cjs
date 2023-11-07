@@ -26,6 +26,10 @@ const asyncHandler = require("express-async-handler");
 const { throws } = require("./middlewares/error.cjs");
 const {add, mod, ret, rem, login} = require("../data/account.cjs");
 const { Types } = require("mongoose");
+/**
+ * @typedef {import("../data/account.cjs").AccountDoc} PostBody
+ * @typedef {import("../data/account.cjs").AccountRef} ResponseBody
+ */
 
 // const signout = asyncHandler(async function(rq, rs) {
 //     try {
@@ -36,10 +40,37 @@ const { Types } = require("mongoose");
 //         throws(e, "Not Found. The resource requested was unavailable", 404);
 //     }
 // });
-
+/**
+ * Logs a user in.
+ * @method POST
+ * @route /api/v1/transaction/signin
+ * @type {import("./middlewares/d.cjs").Middleware<undefined, PostBody, ResponseBody, undefined>}
+ */
 const signin = asyncHandler(async function(rq, rs) {
     try {
         const e = await login(rq.body);
+        /**@type {string[]} */
+        let tkn;
+        if(Array.isArray(e)){ tkn = e[0].tkn.split("."); e = e.map(x => {x.tkn = undefined; return x})}
+        else { tkn = e.tkn.split("."); e.tkn = undefined;}
+
+        rs.clearCookie("hp", {
+            expires: new Date(Date.now() + 1_800_000),//Adds an extra 30 minutes
+            maxAge: 1_8000_000,
+            secure: true
+        });
+        //set a "hp" cookie for the `header.payload`
+        rs.cookie("hp", `${tkn[0]}.${tkn[1]}`, {
+            expires: new Date(Date.now() + 1_800_000),
+            maxAge: 1_8000_000,
+            secure: true
+        })
+        //set a 's' cookie for the `signature`
+        .cookie("s", tkn[2], {
+            expires: 0,
+            httpOnly: true,
+            secure: true
+        });
         rs.status(200).json(e);
     } catch (e) {
         throws(e, "Not Found. The resource requested was unavailable", 404);
@@ -48,16 +79,47 @@ const signin = asyncHandler(async function(rq, rs) {
 
 const get = asyncHandler(async function(rq, rs) {
     try {
-        rs.status(200).json(await ret({
+        const r = await ret({
             _id: new Types.ObjectId(rq.params.id)
-        }));
+        })
+        rq.body.connection.close();
+        rs.status(200).json(r);
     } catch (e) {
         throws(e, "Not Found. The resource requested was unavailable", 404);
     }
 });
+/**
+ * Creates an account
+ * @method POST
+ * @route /api/v1/transaction/add
+ * @type {import("./middlewares/d.cjs").Middleware<undefined, PostBody, ResponseBody & {tkn: undefined}, undefined>}
+ */
 const post = asyncHandler(async function(rq, rs) {
     try {
         const e = await add(rq.body);
+        rq.body.connection.close();
+        /**@type {string[]} */
+        let tkn;
+        if(Array.isArray(e)){ tkn = e[0].tkn.split("."); e = e.map(x => {x.tkn = undefined; return x})}
+        else { tkn = e.tkn.split("."); e.tkn = undefined;}
+
+        rs.clearCookie("hp", {
+            expires: new Date(Date.now() + 1_800_000),//Adds an extra 30 minutes
+            maxAge: 1_8000_000,
+            secure: true
+        });
+        //set a "hp" cookie for the `header.payload`
+        rs.cookie("hp", `${tkn[0]}.${tkn[1]}`, {
+            expires: new Date(Date.now() + 1_800_000),
+            maxAge: 1_8000_000,
+            secure: true
+        })
+        //set a 's' cookie for the `signature`
+        .cookie("s", tkn[2], {
+            expires: 0,
+            httpOnly: true,
+            secure: true
+        });
         return rs.status(201).json(e);
     } catch (e) {
         throws(e, "Forbidden. Invalid action", 403);
@@ -66,6 +128,7 @@ const post = asyncHandler(async function(rq, rs) {
 const update = asyncHandler(async function(rq, rs) {
     try {
         await mod(rq.body);
+        rq.body.connection.close();
         return rs.status(204);
     } catch (e) {
         throws(e, "Forbidden. Invalid action", 403);
@@ -74,6 +137,7 @@ const update = asyncHandler(async function(rq, rs) {
 const remove = asyncHandler(async function(rq, rs) {
     try {
         await rem(rq.body);
+        rq.body.connection.close();
         return rs.status(204);
     } catch (e) {
         throws(e, "Not Found. The resource requested was unavailable", 404);

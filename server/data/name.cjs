@@ -3,7 +3,7 @@ const { create } = require("../models/name.cjs");
 /**
  * An object containing reference(s) to composite types stored against an name in the {@linkcode Name} collection.
  * @typedef {Object} NameRef
- * @property {Types.ObjectId} name a reference to the name itself within the {@linkcode Name} collection.
+ * @property {import("../models/name.cjs").NameDoc} name a reference to the name itself within the {@linkcode Name} collection.
  */
 /**
  * An object representing a figure of currency to be added, subtracted, multiplied, divided etc to the sum total name.
@@ -21,11 +21,9 @@ const add = async p => {
 
 	const Name = create(p.connection);
 
-	_.name = (
-		await new Name({
-			_id: p
-		}).save()
-	)._id;
+	_.name = (await new Name({ _id: p }).save())._id;
+
+	p.connection.close();
 
 	return _;
 };
@@ -57,7 +55,9 @@ const bulkAdd = async p => {
 const ret = async p => {
 	const Name = create(p.connection);
 	if (Array.isArray(p.query)) return await bulkRet(p.query);
-	return await Name.findOne(p.query).select("-_cAt -_uAt -_vk").exec();
+	const r = await Name.findOne(p.query).select("-_cAt -_uAt -_vk").exec();
+	p.connection.close()
+	return r;
 };
 /**
  * Retrieves the details of the given name using the array of queries to execute for each of the item to get.
@@ -89,7 +89,9 @@ const bulkRet = async p => {
 const rem = async p => {
 	const Name = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Name.findByIdAndDelete(p.id).exec();
+	const r = await Name.findByIdAndDelete(p.id).exec();
+	p.connection.close()
+	return r;
 };
 
 /**
@@ -111,7 +113,7 @@ const remBulk = async ids => {
  * Modifies this name's details i.e updates an name.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object
  * @param {Object} p the parameter options
- * @param {import("mongoose").Schema.Types.ObjectId} p._id the id of name to be modified
+ * @param {import("mongoose").Schema.Types.ObjectId} p.id the id of name to be modified
  * @param {import("mongoose").UpdateQuery<import("../models/name.cjs").NameSchemaConfig>} p.query the query to be run
  * which will actually modify the name. This is the modification query.
  * @param {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
@@ -120,7 +122,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
 	const Name = create(p.connection);
-	return await Name.findByIdAndUpdate(p.id, p.query);
+	const r = await Name.findByIdAndUpdate(p.id, p.query);
+	p.connection.close()
+	return r;
 };
 
 module.exports = {

@@ -1,5 +1,5 @@
 
-const { Schema } = require("mongoose");
+const { Schema, default: mongoose } = require("mongoose");
 const { v } = require("../repo/utility.cjs");
 
 /**
@@ -101,7 +101,7 @@ const order = {
         alias: "subject",
         validate: {
             validator: async function(x) {
-                return v(await require("./subject.cjs").Subject.findById(x).exec());
+                return v(await require("./subject.cjs").create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists`;
@@ -136,7 +136,7 @@ const order = {
             required: true,
             validate: {
                 validator: async function(x) {
-                    return v(await require("./product.cjs").Product.findById(x).exec());
+                    return v(await require("./product.cjs").create().findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists as a product`;
@@ -191,10 +191,10 @@ const OrderSchema = new Schema(order, {
 // const Order = model("Order", OrderSchema);
 /**
  * Creates the `Order` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<OrderSchemaConfig>} the `Order` model created from the specified connection.
  */
-const create = c => c.model("Order", OrderSchema);
+const create = (c = mongoose.connections[0]) => c.model("Order", OrderSchema);
 
 module.exports = {
     create, OrderSchema

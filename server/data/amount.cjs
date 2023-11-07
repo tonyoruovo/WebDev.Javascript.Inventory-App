@@ -44,6 +44,8 @@ const add = async p => {
         _v: p.value
     }).save())._id);
 
+    p.connection.close()
+
     return _;
 }
 /**
@@ -75,9 +77,11 @@ const bulkAdd = async p => {
 const ret = async p => {
     const Amount = create(p.connection);
     if(Array.isArray(p.query)) return await bulkRet(p.query);
-    return await Amount.findOne(p.query)
+    const r = await Amount.findOne(p.query)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
+    p.connection.close();
+    return r;
 }
 /**
  * Retrieves the details of the given amount using the array of queries to execute for each of the item to get.
@@ -110,7 +114,9 @@ const bulkRet = async p => {
 const rem = async p => {
     const Amount = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Amount.findByIdAndDelete(p.id).exec();
+	const r = await Amount.findByIdAndDelete(p.id).exec();
+    p.connection.close();
+    return r;
 };
 
 /**
@@ -141,7 +147,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
     const Amount = create(p.connection);
-    return await Amount.findByIdAndUpdate(p.id, p.query);
+    const r = await Amount.findByIdAndUpdate(p.id, p.query);
+    p.connection.close();
+    return r;
 };
 
 module.exports = {

@@ -121,9 +121,9 @@ const AddressSchema = new mongoose.Schema(address, {
 // const Address = mongoose.model("Address", AddressSchema);
 /**
  * Creates the `Address` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<AddressSchemaConfig>} the `Address` model created from the specified connection.
  */
-const create = c => c.model("Address", AddressSchema);
+const create = (c = mongoose.connections[0]) => c.model("Address", AddressSchema);
 
 module.exports = {AddressSchema, create};

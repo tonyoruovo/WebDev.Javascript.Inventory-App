@@ -1,5 +1,5 @@
 
-const { Schema } = require("mongoose");
+const { Schema, default: mongoose } = require("mongoose");
 
 /**
  * @typedef {Object} AlertSchemaConfig
@@ -100,10 +100,10 @@ const AlertSchema = new Schema(alert, {
 // const Alert = model("Alert", AlertSchema);
 /**
  * Creates the `Alert` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<AlertSchemaConfig>} the `Alert` model created from the specified connection.
  */
-const create = c => c.model("Alert", AlertSchema);
+const create = (c = mongoose.connections[0]) => c.model("Alert", AlertSchema);
 
 module.exports = {
     AlertSchema, create

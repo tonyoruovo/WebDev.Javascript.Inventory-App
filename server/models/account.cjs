@@ -1,7 +1,7 @@
-const { Schema } = require("mongoose");
+const { Schema, default: mongoose } = require("mongoose");
 const { defMsg } = require("../data/d.cjs");
 const { v } = require("../repo/utility.cjs");
-const { Email } = require("./email.cjs");
+const email = require("./email.cjs");
 
 /**
  * @typedef {Object} AccountSchemaConfig
@@ -32,7 +32,7 @@ const account = {
             required: true,
             validate: {
                 validator: async function(x) {
-                    return v(await Email.findById(x).exec());
+                    return v(await email.create().findById(x).exec());
                 },
                 message: function(x) {
                     return `${x} does not exists`;
@@ -170,10 +170,10 @@ const AccountSchema = new Schema(account, {
 // const Account = model("Account", AccountSchema);
 /**
  * Creates the `Account` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<AccountSchemaConfig>} the `Account` model created from the specified connection.
  */
-const create = c => c.model("Account", AccountSchema);
+const create = (c = mongoose.connections[0]) => c.model("Account", AccountSchema);
 
 module.exports = {
     AccountSchema, create

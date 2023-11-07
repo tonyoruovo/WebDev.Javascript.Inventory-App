@@ -1,6 +1,7 @@
 
 const { Types } = require("mongoose");
 const { create } = require("../models/location.cjs");
+const { v } = require("../repo/utility.cjs");
 /**
  * An object containing reference(s) to composite types stored against a location in the {@linkcode Location} collection.
  * @typedef {Object} LocationRef
@@ -45,6 +46,8 @@ const add = async p => {
 
     _.contact = new Types.ObjectId(p.contact);
 
+    const sig = v(p.sig) ? Buffer.from(p.sig, "binary") : undefined;
+
     _.location = (await new Location({
         _c: _.contact,
         _cp: new Unit({_u: p.capacity.unit, _v: p.capacity.value}),
@@ -53,8 +56,10 @@ const add = async p => {
         _id: new Types.ObjectId(),
         _pc: p.pics,
         _pt: _.paymentTerms,
-        _s: Buffer.from(p.sig, "binary")
+        _s: sig
     }).save())._id;
+
+    p.connection.close();
 
     return _;
 }
@@ -87,9 +92,11 @@ const bulkAdd = async p => {
 const ret = async p => {
     const Location = create(p.connection);
     if(Array.isArray(p.query)) return await bulkRet(p.query);
-    return await Location.findOne(p.query)
+    const r = await Location.findOne(p.query)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
+    p.connection.close();
+    return r;
 }
 /**
  * Retrieves the details of the given location using the array of queries to execute for each of the item to get.
@@ -122,7 +129,9 @@ const bulkRet = async p => {
 const rem = async p => {
     const Location = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Location.findByIdAndDelete(p.id).exec();
+	const r = await Location.findByIdAndDelete(p.id).exec();
+    p.connection.close();
+    return r;
 };
 
 /**
@@ -153,7 +162,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
     const Location = create(p.connection);
-    return await Location.findByIdAndUpdate(p.id, p.query);
+    const r = await Location.findByIdAndUpdate(p.id, p.query);
+    p.connection.close();
+    return r;
 };
 
 module.exports = {

@@ -1,6 +1,6 @@
 
-const {Schema} = require("mongoose");
-const { Subject } = require("./subject.cjs");
+const {Schema, default: mongoose} = require("mongoose");
+const subject = require("./subject.cjs");
 const { v } = require("../repo/utility.cjs");
 
 /**
@@ -32,7 +32,7 @@ const employee = {
         required: true,
         validate: {
             validator: async function(x) {
-                return v(await Subject.findById(x).exec());
+                return v(await subject.create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists`;
@@ -73,10 +73,10 @@ const EmployeeSchema = new Schema(employee, {
 // const Employee = model("Employee", EmployeeSchema);
 /**
  * Creates the `Employee` model using the given connection.
- * @param {import("mongoose").Connection} c The connection from which to create the model.
+ * @param {import("mongoose").Connection} [c] The connection from which to create the model. If this instance was already connected, it will use the oldest connection specified by `mongoose.connections[0]`.
  * @returns {import("mongoose").Model<EmployeeSchemaConfig>} the `Employee` model created from the specified connection.
  */
-const create = c => c.model("Employee", EmployeeSchema);
+const create = (c = mongoose.connections[0]) => c.model("Employee", EmployeeSchema);
 
 module.exports = {
     create, EmployeeSchema
