@@ -1,4 +1,4 @@
-const { v } = require("../repo/utility.cjs");
+const { v, compareDates } = require("../repo/utility.cjs");
 const { Schema, default: mongoose } = require("mongoose");
 const subject = require("./subject.cjs");
 const amount = require("./amount.cjs");
@@ -12,6 +12,19 @@ const amount = require("./amount.cjs");
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ProductSchemaConfig>} _n the name of this product. The alias is `name`.
  * @property {import("../data/d.cjs").Options<[Schema.Types.String], ProductSchemaConfig>} _c the categories of this product. The `alias` is `categories`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, ProductSchemaConfig>} _desc the description of this product. The `alias` is `description`.
+ *  In the future, this value would be an object whose keys are the properties of the product which may include:
+ * - `color`
+ * - `weight`
+ * - `dietary info`
+ * - `ingredients`
+ * - `contents`
+ * - `size`
+ * - `model`
+ * - `instructions`
+ * - `units`
+ * - `price per unit`
+ * 
+ * And any other relevant info. Note that the actual keys are arbitrary depending on the product, and are not subject to the above
  * @property {import("../data/d.cjs").Options<[Schema.Types.String], ProductSchemaConfig>} _l the array of url strings to the logo (dark, light)
  * and pictures of this product. The alias is `pics`.
  * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, ProductSchemaConfig>} _pr the price. The alias is `price`.
@@ -49,7 +62,14 @@ const product = {
 	},
 	_exp: {
 		type: Schema.Types.Date,
-		min: new Date(),
+        validate: {
+            validator: async function(x) {
+				return compareDates(x, new Date(Date.now())) > 0;
+            },
+            message: function(x) {
+                return `${x.value} is not a valid expiry date`;
+            }
+        },
 		required: true,
 		alias: "expiryDate"
 	},

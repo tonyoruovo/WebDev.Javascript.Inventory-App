@@ -5,6 +5,7 @@ const { create } = require("../models/order.cjs");
  * @typedef {Object} OrderRef
  * @property {Types.ObjectId} order a reference to the order itself within the {@linkcode Order} collection.
  * @property {Types.ObjectId} subject the reference to the subject that sent this order. This is the id of that subject within the {@linkcode Subject} collection.
+ * @property {Types.Buffer} products references to the products that were ordered for.
  */
 /**
  * An object whose properties map to the {@linkcode Order} model, as such, is used to instantiate the model, which is stored in
@@ -32,17 +33,21 @@ const add = async p => {
 
 	_.subject = new Types.ObjectId(p.subject);
 
+	_.products = p.items.map(x => Buffer.from(x, "binary"));
+
 	_.order = (
 		await new Order({
 			_id: new Types.ObjectId(),
 			_c: p.comments,
 			_d: new Date(p.dd),
-			_it: p.items.map(x => new Types.ObjectId(x)),
+			_it: _.products,
 			_ot: p.type,
 			_s: _.subject,
 			_st: "pending"
 		}).save()
 	)._id;
+
+	p.connection.close()
 
 	return _;
 };
@@ -74,7 +79,9 @@ const bulkAdd = async p => {
 const ret = async p => {
 	const Order = create(p.connection);
 	if (Array.isArray(p.query)) return await bulkRet(p.query);
-	return await Order.findOne(p.query).select("-_id -_cAt -_uAt -_vk").exec();
+	const r = await Order.findOne(p.query).select("-_id -_cAt -_uAt -_vk").exec();
+	p.connection.close();
+	return r;
 };
 /**
  * Retrieves the details of the given order using the array of queries to execute for each of the item to get.
@@ -106,7 +113,9 @@ const bulkRet = async p => {
 const rem = async p => {
 	const Order = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Order.findByIdAndDelete(p.id).exec();
+	const r = await Order.findByIdAndDelete(p.id).exec();
+	p.connection.close();
+	return r;
 };
 
 /**
@@ -137,7 +146,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
 	const Order = create(p.connection);
-	return await Order.findByIdAndUpdate(p.id, p.query);
+	const r = await Order.findByIdAndUpdate(p.id, p.query);
+	p.connection.close();
+	return r;
 };
 
 module.exports = {

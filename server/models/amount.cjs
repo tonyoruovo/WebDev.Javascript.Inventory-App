@@ -15,8 +15,19 @@ const { Schema, default: mongoose } = require("mongoose");
  * (for time sensitive amounts). Set to a very distant future (e.g 1000 years) to gain a permanent effect.
  * @property {import("../data/d.cjs").Options<Schema.Types.Number, AmountSchemaConfig>} _v the actual amount value. The
  * `alias` is `value`.
- * @property {import("../data/d.cjs").Options<Schema.Types.String, AmountSchemaConfig>} _t the `amount` type. The `alias`
- * is `dType`.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String, AmountSchemaConfig>} _o the operator to use. The alias is `operator`.
+ * Possible values include:
+ * - `+`: adds to the base price i.e a deduction. This may include taxes, extra charges, fines etc. This is the default.
+ * - `-`:  subtracts from the base price i.e a discount. This may include bonuses from promos, loyalty programmes etc.
+ * @property {import("../data/d.cjs").Options<Schema.Types.String[], AmountSchemaConfig>} _op any additional operation(s) to perform.
+ * The alias is `operations`. The possible values are:
+ * - `n`: No operation is performed.
+ * - `p`: Performs percent operation on the base price, i.e the value given by `_v` is the percentage to be added or subtracted
+ * from the base price.
+ * - `l`: Performs log operation using `_v` as the base and the base price as the argument i.e `log(basePrice, _v)`.
+ * - `d`: Performs division where the divisor is `_v` and the dividend is the base price.
+ * - `m`: Performs multiplication where the multiplier is `_v` and the multiplicand is the base price.
+ * - `rt`: Performs a root function where the 'index' is the value given by `_v` and the 'radicand' is the base price.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AmountSchemaConfig>} _cc the 3-letter ISO currency code for
  * the currency in which this amount is set. The `alias` is `currencyCode`.
  * @property {import("../data/d.cjs").Options<Schema.Types.String, AmountSchemaConfig>} _ct any relevant comments for this
@@ -37,12 +48,21 @@ const amount = {
         immutable: true,
         match: [/^\d\d*\.?\d*/, "{VALUE} is not a decimal currency"]
     },
-    _t: {
+    _o: {
         type: Schema.Types.String,
-        required: true,
-        alias: "dType",
+        default: "+",
+        alias: "operator",
         immutable: true,
-        enum: ["a", "add", "subtract", "s", "multiply", "m", "divide", "d", "sqrt", "cbrt", "exp", "percent", "log"],
+        enum: ["+", "-"]
+    },
+    _op: {
+        type: [{
+            type: Schema.Types.String,
+            enum: ["n", "p", "l", "d", "m", "rt"]
+        }],
+        alias: "operations",
+        required: true,
+        immutable: true
     },
     _cc: {
         type: Schema.Types.String,

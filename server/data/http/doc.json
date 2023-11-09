@@ -1,0 +1,96 @@
+{
+    "Account": { "u": "mathaid", "pw": "qwerty#123()", "e": "654c9125c892c82195e23f8c" },
+    "Address": {
+        "s": "11, Adetayo rd. Bamakuru",
+        "l": "Iliye beach resort",
+        "z": "333330",
+        "cy": "harara",
+        "lg": "visuza",
+        "st": "benue",
+        "msg": "This is a test address"
+    },
+    "Amount": {
+        "comment": "This is a sample deduction. Notice that some properties have been left out to trigger their default values",
+        "commneted out expiresAt": "new Date()",
+        "iso": "566",
+        "op": "+",
+        "opn": ["p"],
+        "value": 3.5
+    },
+    "Contact": {
+        "ac": "654c98aaced8ac487ce69ad0",
+        "as": ["654c9990df105f2385ffb5bd", "654c9a1cdf105f2385ffb5c0"],
+        "cn": "MathAid",
+        "msg": "This contact is the contact of the supplier Mathaid.\n\nProfile pictures, websites and socials will be uploaded on a later date",
+        "n": {
+            "preTitles": [
+                "mr",
+                "bro"
+            ],
+            "name": "anthony",
+            "surname": "oruovo",
+            "others": [
+                "etine",
+                "nyerhowo",
+                "etineakpopha",
+                "kpopha"
+            ],
+            "postTitles": [
+                "bed",
+                "phd"
+            ]
+        },
+        "ps": ["654c9935f17f3aad02c0907f", "654c9a5adf105f2385ffb5c4"]
+    },
+    "Email": {"e": "username@email.co.uk"},
+    "Employee": { "s": "654d034f8de3a671b3a50a12", "sig": "oiuyTREDcvbnm,lKHGTR;./';lkJHGfdcnhg" },
+    "Location": {
+        "contact": "654c9e403cc78f60ef71e6d4",
+        "defaultStatus": "pending",
+        "descr": "This is our sample flagship location",
+        "capacity": {
+            "value": 90000,
+            "unit": "kg"
+        },
+        "pts": ["654ca369d7f1ada3abfc3b28"]
+    },
+    "Order": {
+        "comments": "This is my first order!",
+        "dd": "Tue Nov 14 2023 10:32:13 GMT+0100 (West Africa Standard Time)",
+        "items": [
+            "qwertyuiopkjhgfdsaXCVBNMQWERPOJHGCXZSDRFGHNMKJUHGFDSWEQRTYUIOWPQLSKZ,MXJRYTFGVBNGMBVJC#H#r^wsd;wcvdghyf[p.ucikeo..;dx[;lk;lljzhgvr",
+            "qwertyuiopkjhgfdsaXCVBNMQWeRPOJHGCXZSDRFGHNMKJUHGFDSWEQRTYUIOWPQLSKZ,MXJRYTFGVBNGMBVJC#H#r^wsd;wcvdghyf[p.ucikeo..;dx[;lk;lljzhgvr"
+        ],
+        "type": "sale",
+        "subject": "654cb08b2d2cd81b0b0bb0c0"
+    },
+    "PaymentTerm": {
+        "amounts": ["654caccbdbe53da0fbb9f496", "654cad1edbe53da0fbb9f499"],
+        "codes": ["3079800241"],
+        "interval": "second",
+        "paymentType": "etf",
+        "period": 1,
+        "t_c": "A sample payment term for the e-customer"
+    },
+    "Phone": {"n": "09059396639", "type": "mobile", "pref": 0},
+    "Product": {
+        "b": "qwertyuiopkjhgfdsaXCVBNMQWERPOJHGCXZSDRFGHNMKJUHGFDSWEQRTYUIOWPQLSKZ,MXJRYTFGVBNGMBVJC#H#r^wsd;wcvdghyf[p.ucikeo..;dx[;lk;lljzhgvr",
+        "cs": ["spices", "seasoning", "cube", "cubes", "pack"],
+        "descr": "A packet containing 50 maggi cubes",
+        "ed": "Thu Oct 17 2025 10:32:13 GMT+0100 (West Africa Standard Time)",
+        "logos": [],
+        "m": "halal",
+        "name": "Standard maggi packet",
+        "p": "654cb90b0263e5657417f077",
+        "q": 2050,
+        "r": 500,
+        "s": "654cb08b2d2cd81b0b0bb0c0"
+    },
+    "Subject": {
+        "paymentTerms": ["654cadd3d278f4ab42343f9c", "654cae5ad278f4ab42343fa1"],
+        "contact": "654caff02d2cd81b0b0bb0b8",
+        "g": "m",
+        "dob": "Thu Oct 17 1992 10:32:13 GMT+0100 (West Africa Standard Time)"
+    },
+    "Transaction": { "e": "654d0547ac6bf1dc45350b72", "l": "654ca5f01a1619f26ce3f4b4", "oid": "654cd5a8aab45e9c81c187ca", "amounts": [] }
+}

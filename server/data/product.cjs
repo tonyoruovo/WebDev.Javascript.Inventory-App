@@ -16,29 +16,38 @@ const { v } = require("../repo/utility.cjs");
  * @typedef {Object} ProductDoc
  * @property {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
  * the `Product` model via {@linkcode create()}.
- * @property {string} name the name of this product. Must be unique.
+ * @property {string} b alias for {@linkcode ProductDoc.barcode}
+ * @property {string} barcode the barcode of this product. Must be unique.
+ * @property {string} ct alias for {@linkcode ProductDoc.category}
  * @property {string} [category] the category of this product
  * @property {string[]} [categories] the categories of this product, this is a synonym of {@linkcode ProductDoc.category}.
- * @property {string} c alias for {@linkcode ProductDoc.category}
- * @property {string[]} cs alias for {@linkcode ProductDoc.categories}
- * @property {string} [description] the description of this product
+ * @property {string[]} cts alias for {@linkcode ProductDoc.categories}
+ * @property {string} [description] the description of this product. In the future, this value would be an object whose keys are the properties of the product which may include:
+ * - `color`
+ * - `weight`
+ * - `dietary info`
+ * - `ingredients`
+ * - `contents`
+ * - `size`
+ * - `model`
+ * 
+ * And any other relevant info.
  * @property {string} [descr] the description of this product. A synonym of {@linkcode ProductDoc.desc}
- * @property {string[]} logos the logos of this product
- * @property {string} price an {@linkcode Types.ObjectId} object as a string which represent the proce of this product.
- * @property {string} p alias for {@linkcode ProductDoc.price}
- * @property {string} manufacturer the name of the manufacturer of this product
- * @property {string} m alias for {@linkcode ProductDoc.manufacturer}
- * @property {string | number} manDate the date which this product was manufactured
- * @property {string | number} md alias for {@linkcode ProductDoc.manDate}
- * @property {string | number} expDate the date which this product will expire
  * @property {string | number} ed alias for {@linkcode ProductDoc.expDate}
+ * @property {string | number} expDate the date which this product will expire
+ * @property {string[]} logos the logos of this product
+ * @property {string} m alias for {@linkcode ProductDoc.manufacturer}
+ * @property {string | number} md alias for {@linkcode ProductDoc.manDate}
+ * @property {string | number} manDate the date which this product was manufactured
+ * @property {string} manufacturer the name of the manufacturer of this product
+ * @property {string} name the name of this product. Must be unique.
+ * @property {string} p alias for {@linkcode ProductDoc.price}
+ * @property {string} price an {@linkcode Types.ObjectId} object as a string which represent the proce of this product.
  * @property {number} quantity the quantity of this product
  * @property {number} q alias for {@linkcode ProductDoc.quantity}
  * @property {number} rop the reorder point of this product i.e when quantity levels drop to this number and below, a restock
  * alert will be sent to product responsible for restocking.
  * @property {number} r alias for {@linkcode ProductDoc.rop}
- * @property {string} barcode the barcode of this product. Must be unique.
- * @property {string} b alias for {@linkcode ProductDoc.barcode}
  * @property {string} supplier the id of the supplier of this product. Must already exist in the subject collection.
  * @property {string} s alias for {@linkcode ProductDoc.supplier}
  */
@@ -58,16 +67,16 @@ const add = async (p) => {
     // writeFileSync(`${tempDir}barcode`, p.barcode || p.b, {encoding: "binary"});
 
     // const code = readFileSync(`${tempDir}barcode`, {encoding: "binary"});
-    const code = Buffer.from(p.barcode, "binary");
+    const code = v(p.barcode || p.b) ? Buffer.from(p.barcode || p.b, "binary") : undefined;
 
     const _ = {};
     _.supplier = new Types.ObjectId(p.supplier || p.s);
     _.price = new Types.ObjectId(p.price || p.p);
     _.product = (await new Product({
         _id: code,
-        _c: v(p.category || p.c) ? [(p.category || p.c), ...(p.categories || p.cs)] : (p.categories || p.cs),
+        _c: v(p.category || p.ct) ? [(p.category || p.ct), ...(p.categories || p.cts)] : (p.categories || p.cts),
         _desc: p.descr || p.description,
-        _exp: new Date(p.expDate || p.exp),
+        _exp: new Date(p.expDate || p.ed),
         _l: p.logos,
         _m: p.m || p.manufacturer,
         _man: p.manDate || p.md,
@@ -77,6 +86,8 @@ const add = async (p) => {
         _rop: p.rop || p.r,
         _sp: _.supplier
     }).save())._id;
+
+    p.connection.close();
 
     return _;
 }
@@ -109,7 +120,7 @@ const bulkAdd = async p => {
 const ret = async p => {
     const Product = create(p.connection);
     if(Array.isArray(p.query)) return await bulkRet(p.query);
-    return await Product.findOne(p.query)
+    const r = await Product.findOne(p.query)
     .populate({
         path: "_sp",
         model: "Subject",
@@ -119,6 +130,8 @@ const ret = async p => {
     })
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
+    p.connection.close();
+    return r;
 }
 /**
  * Retrieves the details of the given product using the array of queries to execute for each of the item to get.
@@ -149,7 +162,9 @@ const bulkRet = async p => {
  */
 const mod = async p => {
     const Product = create(p.connection);
-    return await Product.findByIdAndUpdate(p.id, p.query);
+    const r = await Product.findByIdAndUpdate(p.id, p.query);
+    p.connection.close();
+    return r;
 }
 
 /**
@@ -167,7 +182,9 @@ const mod = async p => {
 const rem = async p => {
     const Product = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Product.findByIdAndDelete(p.id).exec();
+	const r = await Product.findByIdAndDelete(p.id).exec();
+    p.connection.close();
+    return r;
 };
 
 /**

@@ -65,7 +65,7 @@ const msg = function(x) {
  * @type {NameSetter}
  */
 const s = function (n) {
-    return `${(n.preTitles??[]).join(String.fromCharCode(US))}${String.fromCharCode(GS)}${n.name}${String.fromCharCode(GS)}${n.surname}${String.fromCharCode(GS)}${(n.others??[]).join(String.fromCharCode(US))}${String.fromCharCode(GS)}${(n.postTitles??[]).join(String.fromCharCode(US))}`
+    return `${(n.preTitles??[]).join(String.fromCharCode(US))}${String.fromCharCode(GS)}${n.name??""}${String.fromCharCode(GS)}${n.surname??""}${String.fromCharCode(GS)}${(n.others??[]).join(String.fromCharCode(US))}${String.fromCharCode(GS)}${(n.postTitles??[]).join(String.fromCharCode(US))}`
 }
 /**
  * Gets the value for a given person

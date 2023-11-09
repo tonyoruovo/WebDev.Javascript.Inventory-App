@@ -1,28 +1,46 @@
 {
-    "name": {
-        "preTitles": [
-            "mr",
-            "bro"
-        ],
-        "name": "anthony",
-        "surname": "oruovo",
-        "others": [
-            "etine",
-            "nyerhowo",
-            "kpopha"
-        ],
-        "postTitles": [
-            "bed",
-            "phd"
+    "Location": {
+        "names": { "preTitles": [ "mr", "bro" ], "name": "anthony", "surname": "oruovo", "others": [ "etine", "nyerhowo", "kpopha" ], "postTitles": [ "bed", "phd" ] },
+        "email": "654c9125c892c82195e23f8c",
+        "account": "654c98aaced8ac487ce69ad0",
+        "phones": ["654c9935f17f3aad02c0907f", "654c9a5adf105f2385ffb5c4"],
+        "addresses": ["654c9990df105f2385ffb5bd", "654c9a1cdf105f2385ffb5c0"],
+        "contact": "654caff02d2cd81b0b0bb0b8",
+        "amounts": ["654ca155d7f1ada3abfc3b1d", "654ca184d7f1ada3abfc3b20"],
+        "paymentTerms": ["654ca369d7f1ada3abfc3b28"],
+        "location": "654ca5f01a1619f26ce3f4b4"
+        
+    },
+    "Subject": {
+        "email": "654ca77e4769f65ed03857fb",
+        "account": "654ca8174769f65ed03857fe",
+        "phones": ["654c9935f17f3aad02c0907f", "654c9a5adf105f2385ffb5c4"],
+        "addresses": ["654ca9324769f65ed0385802", "654ca9794769f65ed0385805"],
+        "contact": "654caff02d2cd81b0b0bb0b8",
+        "name": { "preTitles": [ "" ], "name": "tine", "surname": "oruovo", "others": [ "" ], "postTitles": [ "" ] },
+        "amounts": ["654caccbdbe53da0fbb9f496", "654cad1edbe53da0fbb9f499"],
+        "paymentTerms": ["654cadd3d278f4ab42343f9c", "654cae5ad278f4ab42343fa1"],
+        "subject": "654cb08b2d2cd81b0b0bb0c0"
+    },
+    "Order": {
+        "subject": "654cb08b2d2cd81b0b0bb0c0",
+        "order": "654cd5a8aab45e9c81c187ca",
+        "products": [
+            "qwertyuiopkjhgfdsaXCVBNMQWERPOJHGCXZSDRFGHNMKJUHGFDSWEQRTYUIOWPQLSKZ,MXJRYTFGVBNGMBVJC#H#r^wsd;wcvdghyf[p.ucikeo..;dx[;lk;lljzhgvr",
+            "qwertyuiopkjhgfdsaXCVBNMQWeRPOJHGCXZSDRFGHNMKJUHGFDSWEQRTYUIOWPQLSKZ,MXJRYTFGVBNGMBVJC#H#r^wsd;wcvdghyf[p.ucikeo..;dx[;lk;lljzhgvr"
         ]
     },
-    "email": "654a18c400a20d69b25c44fb",
-    "account": "654a35cc65e23720ce5a6697",
-    "phone": "654a50c50cd6a4acf38b5651",
-    "address": "654a5aa6551adbd3d9b7dc63",
-    "contact": "654a692bb386b748b2a59eac",
-    "amounts": ["654a6d23eaccc05ecd5f82cf", "654a6d65eaccc05ecd5f82d2"],
-    "paymentTerm": "654a7641f58193d62e6d787d",
-    "location": "654a7a7994f9c42603f15135",
-    
+    "Employee": {
+        "email": "654cfcdf3ef8d3ba8d3c1de9",
+        "account": "654cfe348de3a671b3a509f3",
+        "phone": ["654cff248de3a671b3a509f8", "654d00558de3a671b3a509fe"],
+        "name": { "preTitles": [ "" ], "name": "Eustace", "surname": "Hori", "others": [ "" ], "postTitles": [ "" ] },
+        "address": ["654d016e8de3a671b3a50a03", "654d01bc8de3a671b3a50a06"],
+        "contact": "654d02d28de3a671b3a50a0a",
+        "subject": "654d034f8de3a671b3a50a12",
+        "employee": "654d0547ac6bf1dc45350b72"
+    },
+    "Transaction": {
+        "transaction": "654d070a75be075d7bf95dfc"
+    }
 }

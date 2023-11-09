@@ -38,6 +38,8 @@ const add = async p => {
         _ta: p.amounts.map(x => new Types.ObjectId(x)),
     }).save())._id);
 
+    p.connection.close();
+
     return _;
 }
 /**
@@ -69,9 +71,11 @@ const bulkAdd = async p => {
 const ret = async p => {
     const Transaction = create(p.connection);
     if(Array.isArray(p.query)) return await bulkRet(p.query);
-    return await Transaction.findOne(p.query)
+    const r = await Transaction.findOne(p.query)
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
+    p.connection.close();
+    return r;
 }
 /**
  * Retrieves the details of the given transaction using the array of queries to execute for each of the item to get.
@@ -104,7 +108,9 @@ const bulkRet = async p => {
 const rem = async p => {
     const Transaction = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Transaction.findByIdAndDelete(p.id).exec();
+	const r = await Transaction.findByIdAndDelete(p.id).exec();
+    p.connection.close();
+    return r;
 };
 
 /**
@@ -135,7 +141,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
     const Transaction = create(p.connection);
-    return await Transaction.findByIdAndUpdate(p.id, p.query);
+    const r = await Transaction.findByIdAndUpdate(p.id, p.query);
+    p.connection.close();
+    return r;
 };
 
 module.exports = {

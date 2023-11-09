@@ -35,7 +35,7 @@ const employee = {
                 return v(await subject.create().findById(x).exec());
             },
             message: function(x) {
-                return `${x} does not exists`;
+                return `${x} does not exist`;
             }
         }
     },

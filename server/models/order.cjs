@@ -35,7 +35,7 @@ const { v } = require("../repo/utility.cjs");
  * for both purchase and sales order processes. Users can easily discern the current state of any order, whether it's related to procurement
  * or sales, within the same system.
  * @typedef {Object} OrderSchemaConfig
- * @property {Schema.Types.ObjectId} _id The mongoose id for this order.
+ * @property {mongoose.Types.ObjectId} _id The mongoose id for this order.
  * @property {import("../data/d.cjs").Options<Schema.Types.ObjectId, OrderSchemaConfig>} _s the subject that made this order. This may be an employee (purchases, transfers, adjustments etc) or cutomer (sales).
  * @property {import("../data/d.cjs").Options<Schema.Types.String, OrderSchemaConfig>} _ot the type of order. The alias `orderType`.\
  * \
@@ -131,7 +131,7 @@ const order = {
     // },
     _it: {
         type: [{
-            type: Schema.Types.ObjectId,
+            type: Schema.Types.Buffer,
             ref: "Product",
             required: true,
             validate: {
@@ -158,7 +158,7 @@ const order = {
         enum: [`pending`, `recieved`, `canceled`, `shipped`, `approved`, `in-progress`, `completed`, `failed`, 'other']
     },
     _c: {
-        type: Schema.Types.ObjectId,
+        type: Schema.Types.String,
         alias: "comment"
     }
 }

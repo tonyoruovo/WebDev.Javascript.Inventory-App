@@ -12,7 +12,7 @@ const { create } = require("../models/subject.cjs");
  * An object whose properties map to the {@linkcode Subject} model, as such, is used to instantiate the model, which is stored in
  * a `Subject` collection afterwards.
  * @typedef {Object} SubjectDoc
- * @property {import("mongoose").Connection} p.connection The accompanying connection to the mongodb. This allows access to
+ * @property {import("mongoose").Connection} connection The accompanying connection to the mongodb. This allows access to
  * the `Subject` model via {@linkcode create()}.
  * @property {string[]} paymentTerms an array of {@linkcode Types.ObjectId} objects as a string representing the payment term of this subject.
  * @property {string} contact {@linkcode Types.ObjectId} as a string representing the id of the contact
@@ -41,6 +41,8 @@ const add = async p => {
         _dob: new Date(p.dob),
         _g: p.gender || p.g,
     }).save())._id;
+
+    p.connection.close()
 
     return _;
 }
@@ -73,13 +75,15 @@ const bulkAdd = async p => {
 const ret = async p => {
     const Subject = create(p.connection);
     if(Array.isArray(p.query)) return await bulkRet(p.query);
-    return await Subject.findOne(p.query)
+    const r = await Subject.findOne(p.query)
     .populate({
         path: "_c",
         model: "Contact",
     })
     .select("-_id -_cAt -_uAt -_vk")
     .exec();
+    p.connection.close();
+    return r;
 }
 /**
  * Retrieves the details of the given subject using the array of queries to execute for each of the item to get.
@@ -96,7 +100,6 @@ const bulkRet = async p => {
     }
     return docs;
 }
-
 /**
  * Deletes this subject from a given session (memory) or from the {@linkcode Subject} collection.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
@@ -112,9 +115,10 @@ const bulkRet = async p => {
 const rem = async p => {
     const Subject = create(p.connection);
 	if (Array.isArray(p.id)) return await remBulk(p.id);
-	return await Subject.findByIdAndDelete(p.id).exec();
+	const r = await Subject.findByIdAndDelete(p.id).exec();
+    p.connection.close();
+    return r;
 };
-
 /**
  * Deletes this employees from a given session (memory) or from the {@linkcode Subject} collection.
  * @todo removed this param {import("../server.cjs").DbObject} m the session object. Should be `null` or `undefined` if the deletion is meant
@@ -143,7 +147,9 @@ const remBulk = async ids => {
  */
 const mod = async p => {
     const Subject = create(p.connection);
-    return await Subject.findByIdAndUpdate(p.id, p.query);
+    const r = await Subject.findByIdAndUpdate(p.id, p.query);
+    p.connection.close();
+    return r;
 };
 
 module.exports = {

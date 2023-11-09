@@ -38,11 +38,23 @@ module.exports = () => {
     }*/
     
     const app = require("express")();
-    
-    // app.use(require("./controllers/middlewares/decode.cjs"));
-    
-    // app.use(cookieParser(c.pem_key));
-    app.use(bodyParser.json());
+
+    /*
+    setInterval(async () => {
+        const Report = require("./models/report.cjs").create();
+        const r = await Report.create({
+            _id: new mongoose.Types.ObjectId(),
+            _m: "Auto generated monthly reports",
+            _pf: [
+                { modelName: "Transaction", path: ["_ta"] }
+            ],
+            _t: "sales"
+        });
+        r.save();
+    }, (3_600_000 * 24) * 30)//every 30 days
+    */
+
+    app.use(bodyParser.json({limit: (1024 * 1024) * 5}));//5mb
     app.use(bodyParser.text());
     app.use(bodyParser.raw());
     app.use(bodyParser.urlencoded({extended: false}));
@@ -71,7 +83,7 @@ module.exports = () => {
     app.use("/api/v1/subject", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/subject.cjs"));
     app.use("/api/v1/transaction", require("./controllers/middlewares/dbInit.cjs")(), require("./routes/transaction.cjs"));
     app.use(e404);
-    app.use(handler)
+    app.use(handler);
     
     app.listen(7070, () => {
     //     console.log(`\u20AF: "Hello world! Jesus Christ is my Lord".

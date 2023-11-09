@@ -42,7 +42,7 @@ const set = async p => {
 
 	const _ = {};
 
-	_.subject = new Types.ObjectId(p.subject);
+	_.subject = new Types.ObjectId(p.subject || p.s);
 
 	const Employee = create(p.connection);
 
@@ -51,6 +51,8 @@ const set = async p => {
 		_s: _.subject,
 		_sig: Buffer.from(p.sig, "binary")
 	}).save())._id;
+
+	p.connection.close();
 
 	return _;
 };
@@ -81,7 +83,9 @@ const bulkSet = async p => {
  */
 const mod = async p => {
 	const Employee = create(p.connection);
-	return await Employee.findByIdAndUpdate(p.id, p.query);
+	const r = await Employee.findByIdAndUpdate(p.id, p.query);
+	p.connection.close();
+	return r;
 };
 /**
  * Retrieves this employee's details from a given session (memory) or from the {@linkcode Employee} collection.
@@ -100,7 +104,7 @@ const mod = async p => {
 const get = async p => {
 	const Employee = create(p.connection);
 	if (Array.isArray(p.query)) return bulkGet(p.query);
-	return await Employee.findOne(p.query)
+	const r = await Employee.findOne(p.query)
 		.populate({
 			path: "_a",
 			model: "Account",
@@ -117,6 +121,8 @@ const get = async p => {
 		})
 		.select("-_s -_id -_cAt -_uAt -_vk")
 		.exec();
+		p.connection.close();
+		return r;
 };
 /**
  * Retrieves an array of employee's details from a given session (memory) or from the {@linkcode Employee} collection.
@@ -150,7 +156,9 @@ const bulkGet = p => {
 const del = async p => {
 	const Employee= create(p.connection);
 	if (Array.isArray(p.id)) return delBulk(p.id);
-	return await Employee.findByIdAndDelete(p.id).exec();
+	const r = await Employee.findByIdAndDelete(p.id).exec();
+	p.connection.close();
+	return r;
 };
 /**
  * Deletes this employees from a given session (memory) or from the {@linkcode Employee} collection.

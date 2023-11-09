@@ -65,7 +65,7 @@ const transaction = {
         required: true,
         validate: {
             validator: async function(x) {
-                return v(await require("./employee.cjs").employee.create().findById(x).exec());
+                return v(await require("./employee.cjs").create().findById(x).exec());
             },
             message: function(x) {
                 return `${x} does not exists as an employee`;

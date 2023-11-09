@@ -168,7 +168,6 @@ const mod = async p => {
  */
 const login = async p => {
 	const Account = create(p.connection);
-	// console.log(p);
 	let u = p.u || p.username;
 	const pw = p.pw || p.password || p.unhashed;
 	if (!v(u)) throw Error("username is missing");

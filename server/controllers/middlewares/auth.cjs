@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const { create } = require("../../models/account.cjs");
-const { throws, nAuth } = require("./error.cjs");
 const { v, rootFolder } = require("../../repo/utility.cjs");
+const { default: mongoose } = require("mongoose");
 
 /**
  * Middleware for JWT authentication. This provides protection of routes for users and validation of Bearer authentication headers.
@@ -14,41 +14,65 @@ const { v, rootFolder } = require("../../repo/utility.cjs");
  * @type {import("../middlewares/d.cjs").Middleware<unknown, {connection: import("mongoose").Connection}, unknown, unknown>}
  */
 const auth = asyncHandler(
-	/** */ async (
-		req,
-		res,
-		next
-	) => {
+	/** */ async (req, res, next) => {
 		if (
 			req.headers.authorization &&
 			req.headers.authorization.startsWith("Bearer")
 		) {
 			try {
 				let t = req.headers.authorization.split(" ")[1];
-				const verified = jwt.verify(t, require(rootFolder() + "/config.json").jwt);
+				const verified = jwt.verify(
+					t,
+					require(rootFolder() + "/config.json").jwt
+				);
 				const Account = create(req.body.connection);
 				req.user = await Account.findById(verified.id).select("_id -_h");
-				if (!v(req.user) || !v(req.user._u)) nAuth(Error("Not Authourized"));
-				next();
+				if (!v(req.user) || !v(req.user._u)) {
+					const e = Error("Not Authourized");
+					e.statusCode = 401;
+					mongoose.connections.forEach(async c => await c.close(true));
+					return next(e);
+				}
+				// next();
 			} catch (e) {
-				throws(e, "", 400);
+				e.statusCode = 400;
+				mongoose.connections.forEach(async c => await c.close(true));
+				return next(e);
+				// throws(e, "", 400);
 			}
-		} else if(v(req.cookies)){
+		} else if (v(req.cookies) && Object.keys(req.cookies).length > 0) {
 			const cookies = req.cookies;
 			try {
 				const headerPayload = cookies.hp.split(".");
 				const signature = cookies.s;
 				const token = weld(headerPayload[0], headerPayload[1], signature);
-				const verified = jwt.verify(token, require(rootFolder() + "/config.json").jwt);
+				const verified = jwt.verify(
+					token,
+					require(rootFolder() + "/config.json").jwt
+				);
 				// console.log({connection: req.body.connection});
 				const Account = create(req.body.connection);
 				req.user = await Account.findById(verified.id).select("_id -_h");
-				if (!v(req.user) || !v(req.user._u)) nAuth(Error("Not Authourized"));
-				next();
+				if (!v(req.user) || !v(req.user._u)) {
+					const e = Error("Not Authourized");
+					e.statusCode = 401;
+					mongoose.connections.forEach(async c => await c.close(true));
+					return next(e);
+				}
+				// next();
 			} catch (e) {
-				throws(e, "", 400);
+				e.statusCode = 400;
+				mongoose.connections.forEach(async c => await c.close(true));
+				return next(e);
+				// throws(e, "", 400);
 			}
-		} else nAuth(Error("Not Authourized"));
+		} else {
+			const e = Error("Not Authourized");
+			e.statusCode = 401;
+			mongoose.connections.forEach(async c => await c.close(true));
+			return next(e);
+		}
+		return next();
 	}
 );
 /**

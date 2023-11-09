@@ -14,9 +14,10 @@ const { create } = require("../models/amount.cjs");
  * the `Amount` model via {@linkcode create()}.
  * @property {string} [iso="566"] the 3-letter ISO currency code for the currency being used for this transaction. The default is the code
  * `"566"` which is the currency code for the Nigerian Naira.
- * @property {"a" | "add" | "subtract" | "s" | "multiply" | "m" | "divide" | "d" | "sqrt" | "cbrt" | "exp" | "percent" | "log"} [type="add"]
- * The type of relation this will have to the total (base) amount. For example, if this value is `"add"`, then the {@linkcode AmountDoc.value}
- * property will be added to base amount.
+ * @property {"+" | "-"} [operator="+"] the oprator to use when adding to the base amount.
+ * @property {string} [op] an alias for {@linkcode AmountDoc.operator}.
+ * @property {string[]} [operations] an array of operations to be performed on the amount. See `Amount` model documentation for accepted values.
+ * @property {string[]} [opn] an alias for {@linkcode AmountDoc.operations}.
  * @property {number} value the numerical representation of this amount.
  * @property {string | number} [expiresAt] for time-sensitive bills, promos and deductables. Specifies the time stamp for the expiration of
  * this amount. This is a {@linkcode Date} string value.
@@ -40,7 +41,9 @@ const add = async p => {
         _cc: p.iso || "566",
         _ct: p.comment || p.comments,
         _expiresAt: new Date(p.expiresAt || Date.now()),
-        _t: p.type || "add",
+        // _t: p.type || "add",
+        _o: p.op || p.operator || "+",
+        _op: p.opn || p.operations || ["n"],
         _v: p.value
     }).save())._id);
 

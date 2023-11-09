@@ -23,7 +23,7 @@ const { v } = require("../repo/utility.cjs");
  * @property {import("../models/name.cjs").NameDoc} [name] the name representing the fullname of the owner of this contact.
  * @property {string} [a] alias for {@linkcode ContactDoc.address}
  * @property {string} [address] {@linkcode Types.ObjectId} as a string representing the address of this contact.
- * @property {string[]} [as] alias for {@linkcode ContactDoc.address}
+ * @property {string[]} [as] alias for {@linkcode ContactDoc.addresses}
  * @property {string[]} [addresses] an array of {@linkcode Types.ObjectId} objects as strings representing the addresses of this contact.
  * @property {string} [ac] alias for {@linkcode ContactDoc.account}
  * @property {string} [account] {@linkcode Types.ObjectId} as a string representing the account of this contact.
