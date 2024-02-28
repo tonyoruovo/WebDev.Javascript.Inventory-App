@@ -65,19 +65,38 @@ const msg = function(x) {
  * @type {NameSetter}
  */
 const s = function (n) {
-    return `${(n.preTitles??[]).join(String.fromCharCode(US))}${String.fromCharCode(GS)}${n.name??""}${String.fromCharCode(GS)}${n.surname??""}${String.fromCharCode(GS)}${(n.others??[]).join(String.fromCharCode(US))}${String.fromCharCode(GS)}${(n.postTitles??[]).join(String.fromCharCode(US))}`
+    return `${
+        (n.preTitles??[]).map(x => x.toLowerCase()).sort().join(String.fromCharCode(US))
+    }${
+        String.fromCharCode(GS)
+    }${
+        n.name.toLowerCase()
+    }${
+        String.fromCharCode(GS)
+    }${
+        n.surname.toLowerCase()
+    }${
+        String.fromCharCode(GS)
+    }${
+        (n.others??[]).map(x => x.toLowerCase()).sort().join(String.fromCharCode(US))
+    }${
+        String.fromCharCode(GS)
+    }${
+        (n.postTitles??[]).map(x => x.toLowerCase()).sort().join(String.fromCharCode(US))
+    }`
 }
 /**
  * Gets the value for a given person
  * @type {NameGetter}
  */
 const g = function (n) {
+    const f = (y) => {if(y.length < 1) return undefined; return y.split(String.fromCodePoint(US));}
     const v = n.split(String.fromCharCode(GS));
-    const preTitles = v.shift().split(String.fromCodePoint(US));
+    const preTitles = f(v.shift());
     const name = v.shift();
     const surname = v.shift();
-    const others = v.shift().split(String.fromCodePoint(US));
-    const postTitles = v.pop().split(String.fromCodePoint(US));
+    const others = f(v.shift());
+    const postTitles = f(v.pop());
     return { preTitles, name, surname, others, postTitles }
 }
 /**

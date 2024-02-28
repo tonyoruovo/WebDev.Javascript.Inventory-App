@@ -144,6 +144,23 @@ const account = {
     },
 };
 /**
+ * @type {import("../data/d.cjs").MongooseSchemaOptions}
+ */
+const option = {
+    toJSON: {
+        aliases: true,
+        versionKey: false,
+        getters: true,
+        minimize: true,
+        virtuals: true
+    },
+    timestamps: {
+        createdAt: "_cAt",
+        updatedAt: "_uAt"
+    },
+    versionKey: "_vk"
+};
+/**
  * uses the following for the second argument:
  * ```json
  * {
@@ -156,13 +173,7 @@ const account = {
  * ```
  * @type {Schema<AccountSchemaConfig>}
  */
-const AccountSchema = new Schema(account, {
-    timestamps: {
-        createdAt: "_cAt",
-        updatedAt: "_uAt"
-    },
-    versionKey: "_vk"
-});
+const AccountSchema = new Schema(account, option);
 /**
  * The model for the account
  * @type {import("mongoose").Model<AccountSchemaConfig>}
